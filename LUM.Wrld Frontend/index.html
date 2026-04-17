@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="description" content="lum.wrld — Light Up My Wrld. Aesthetic streetwear brand from Gqeberha, South Africa. Bold prints, premium fabrics."/>
+<title>LUM.WRLD — Light Up My Wrld</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --black:#050505;
+  --near-black:#0c0c0c;
+  --card:#111;
+  --green:#3a9e3a;
+  --green-bright:#4cce4c;
+  --green-neon:#39ff14;
+  --green-dim:rgba(76,206,76,.10);
+  --green-glow:0 0 16px rgba(76,206,76,.55),0 0 48px rgba(76,206,76,.2);
+  --white:#f2f2f2;
+  --muted:#5a5a5a;
+  --border:#1c1c1c;
+  --red:#ff3b3b;
+  --font-d:'Bebas Neue',sans-serif;
+  --font-c:'Barlow Condensed',sans-serif;
+  --font-b:'DM Sans',sans-serif;
+  --trans:.25s ease;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth;font-size:16px}
+body{background:var(--black);color:var(--white);font-family:var(--font-b);overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+img{display:block;width:100%;height:100%;object-fit:cover}
+button{cursor:pointer;border:none;background:none;font-family:inherit}
+input,textarea,select{font-family:inherit}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:var(--black)}
+::-webkit-scrollbar-thumb{background:var(--green-bright);border-radius:2px}
+::selection{background:var(--green-bright);color:var(--black)}
+
+.neon{color:var(--green-bright)}
+.section-tag{font-family:var(--font-c);font-weight:700;font-size:.7rem;letter-spacing:.3em;text-transform:uppercase;color:var(--green-bright);margin-bottom:.75rem;display:flex;align-items:center;gap:.75rem}
+.section-tag::before{content:'';width:1.5rem;height:1px;background:var(--green-bright);flex-shrink:0}
+.section-title{font-family:var(--font-d);font-size:clamp(2.8rem,6vw,5.5rem);line-height:.92;text-transform:uppercase;letter-spacing:.02em}
+.btn-primary{display:inline-flex;align-items:center;justify-content:center;gap:.5rem;font-family:var(--font-c);font-weight:800;font-size:.82rem;letter-spacing:.22em;text-transform:uppercase;background:var(--green-bright);color:var(--black);padding:.85rem 2.2rem;transition:box-shadow var(--trans),transform var(--trans)}
+.btn-primary:hover{box-shadow:var(--green-glow);transform:translateY(-2px)}
+.btn-ghost{display:inline-flex;align-items:center;gap:.5rem;font-family:var(--font-c);font-weight:700;font-size:.82rem;letter-spacing:.2em;text-transform:uppercase;background:transparent;color:var(--white);border:1px solid var(--border);padding:.85rem 2.2rem;transition:border-color var(--trans),color var(--trans)}
+.btn-ghost:hover{border-color:var(--green-bright);color:var(--green-bright)}
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .65s ease,transform .65s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+
+/* TICKER */
+.ticker{background:var(--green-bright);overflow:hidden;white-space:nowrap;padding:9px 0;position:sticky;top:0;z-index:1000}
+.ticker-track{display:inline-flex;animation:scroll-left 22s linear infinite}
+.ticker-track:hover{animation-play-state:paused}
+.ticker-item{font-family:var(--font-c);font-weight:800;font-size:.78rem;letter-spacing:.18em;text-transform:uppercase;color:var(--black);padding:0 2rem}
+.ticker-item::after{content:'✦';margin-left:2rem}
+@keyframes scroll-left{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* NAV */
+nav{position:fixed;top:36px;left:0;right:0;z-index:900;display:flex;align-items:center;justify-content:space-between;padding:0 clamp(1.2rem,5vw,3.5rem);transition:all .3s ease}
+nav.scrolled{top:0;background:rgba(5,5,5,.96);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-bottom:1px solid var(--border);padding-top:.7rem;padding-bottom:.7rem}
+.nav-logo{display:flex;align-items:center;height:48px}
+.nav-logo-text{font-family:var(--font-d);font-size:1.8rem;letter-spacing:.12em;color:var(--white);line-height:1}
+.nav-logo-text span{color:var(--green-bright)}
+.nav-links{display:flex;gap:2.2rem;list-style:none}
+.nav-links a{font-family:var(--font-c);font-weight:600;font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);transition:color var(--trans)}
+.nav-links a:hover{color:var(--green-bright)}
+.nav-right{display:flex;align-items:center;gap:1rem}
+.nav-whatsapp{background:none;border:none;padding:.4rem;color:var(--muted);transition:color var(--trans);font-size:1.1rem}
+.nav-whatsapp:hover{color:var(--green-bright)}
+.cart-btn{position:relative;font-family:var(--font-c);font-weight:800;font-size:.75rem;letter-spacing:.18em;text-transform:uppercase;background:var(--green-bright);color:var(--black);padding:.55rem 1.3rem;transition:box-shadow var(--trans)}
+.cart-btn:hover{box-shadow:var(--green-glow)}
+.cart-count{position:absolute;top:-7px;right:-7px;background:var(--red);color:#fff;font-size:.6rem;font-weight:700;width:18px;height:18px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-b);display:none}
+.cart-count.show{display:flex}
+.hamburger{display:none;flex-direction:column;gap:5px;padding:4px}
+.hamburger span{display:block;width:22px;height:2px;background:var(--white);transition:all .3s}
+
+/* MOBILE NAV */
+.mobile-overlay{display:none;position:fixed;inset:0;background:var(--black);z-index:890;flex-direction:column;align-items:center;justify-content:center;gap:2rem}
+.mobile-overlay.open{display:flex}
+.mobile-overlay a{font-family:var(--font-d);font-size:clamp(2.8rem,10vw,4.5rem);letter-spacing:.08em;text-transform:uppercase;color:var(--white);transition:color var(--trans)}
+.mobile-overlay a:hover{color:var(--green-bright)}
+.mobile-overlay .mob-contact{display:flex;gap:1rem;margin-top:1rem}
+.mobile-overlay .mob-contact a{font-family:var(--font-c);font-size:clamp(.9rem,3vw,1.1rem);color:var(--muted)}
+
+/* CART */
+.cart-overlay{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:950;opacity:0;pointer-events:none;transition:opacity .3s}
+.cart-overlay.open{opacity:1;pointer-events:all}
+.cart-drawer{position:fixed;top:0;right:0;bottom:0;width:min(400px,100vw);background:var(--near-black);border-left:1px solid var(--border);z-index:960;transform:translateX(100%);transition:transform .35s ease;display:flex;flex-direction:column}
+.cart-drawer.open{transform:translateX(0)}
+.cart-drawer-head{display:flex;align-items:center;justify-content:space-between;padding:1.5rem;border-bottom:1px solid var(--border)}
+.cart-drawer-head h3{font-family:var(--font-d);font-size:1.5rem;letter-spacing:.1em}
+.cart-close{font-size:1.5rem;color:var(--muted);transition:color var(--trans)}
+.cart-close:hover{color:var(--green-bright)}
+.cart-items{flex:1;overflow-y:auto;padding:1rem 1.5rem}
+.cart-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:1rem;color:var(--muted)}
+.cart-empty svg{opacity:.3}
+.cart-empty p{font-family:var(--font-c);letter-spacing:.15em;text-transform:uppercase;font-size:.8rem}
+.cart-item{display:flex;gap:1rem;padding:1rem 0;border-bottom:1px solid var(--border)}
+.cart-item-img{width:70px;height:80px;flex-shrink:0;background:var(--card);overflow:hidden}
+.cart-item-img img{width:70px;height:80px;object-fit:cover}
+.cart-item-info{flex:1;display:flex;flex-direction:column;gap:.3rem}
+.cart-item-name{font-family:var(--font-c);font-weight:700;font-size:.9rem;letter-spacing:.05em;text-transform:uppercase}
+.cart-item-variant{font-size:.75rem;color:var(--muted)}
+.cart-item-price{font-family:var(--font-d);font-size:1rem;color:var(--green-bright)}
+.cart-item-remove{font-size:.7rem;font-family:var(--font-c);letter-spacing:.1em;text-transform:uppercase;color:var(--muted);transition:color var(--trans);margin-top:auto}
+.cart-item-remove:hover{color:var(--red)}
+.cart-qty{display:flex;align-items:center;gap:.5rem;margin-top:.3rem}
+.qty-btn{width:24px;height:24px;border:1px solid var(--border);font-size:.9rem;color:var(--white);display:flex;align-items:center;justify-content:center;transition:border-color var(--trans)}
+.qty-btn:hover{border-color:var(--green-bright);color:var(--green-bright)}
+.qty-num{font-family:var(--font-c);font-size:.85rem;min-width:20px;text-align:center}
+.cart-footer{padding:1.5rem;border-top:1px solid var(--border)}
+.cart-total-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:1.2rem}
+.cart-total-label{font-family:var(--font-c);font-size:.8rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.cart-total-amt{font-family:var(--font-d);font-size:1.5rem;color:var(--green-bright)}
+.checkout-btn{width:100%;font-family:var(--font-c);font-weight:800;font-size:.85rem;letter-spacing:.2em;text-transform:uppercase;background:var(--green-bright);color:var(--black);padding:1rem;transition:box-shadow var(--trans)}
+.checkout-btn:hover{box-shadow:var(--green-glow)}
+.cart-wa-note{font-size:.72rem;color:var(--muted);text-align:center;margin-top:.8rem;line-height:1.6}
+
+/* HERO */
+.hero{position:relative;min-height:100svh;display:grid;grid-template-columns:1fr 1fr;overflow:hidden}
+.hero-glow{position:absolute;width:600px;height:600px;background:radial-gradient(circle,rgba(76,206,76,.12) 0%,transparent 70%);top:50%;left:30%;transform:translate(-50%,-50%);animation:glow-pulse 4s ease-in-out infinite;pointer-events:none;z-index:1}
+@keyframes glow-pulse{0%,100%{opacity:.5;transform:translate(-50%,-50%) scale(1)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.12)}}
+.hero-left{display:flex;flex-direction:column;justify-content:flex-end;padding:clamp(2rem,5vw,4.5rem) clamp(1.2rem,5vw,3.5rem);padding-top:140px;position:relative;z-index:2}
+.hero-eyebrow{font-family:var(--font-c);font-weight:700;font-size:.72rem;letter-spacing:.3em;text-transform:uppercase;color:var(--green-bright);margin-bottom:1.2rem;animation:fade-up .7s ease both}
+.hero-title{font-family:var(--font-d);font-size:clamp(5rem,11vw,9.5rem);line-height:.88;text-transform:uppercase;letter-spacing:.02em;margin-bottom:1.8rem;animation:fade-up .7s .1s ease both}
+.hero-title .lit{color:var(--green-bright);display:block}
+.hero-body{font-size:.92rem;color:var(--muted);line-height:1.75;max-width:340px;margin-bottom:2rem;animation:fade-up .7s .2s ease both}
+.hero-ctas{display:flex;gap:.8rem;flex-wrap:wrap;animation:fade-up .7s .3s ease both}
+.hero-stats{display:flex;gap:2rem;margin-top:3rem;animation:fade-up .7s .4s ease both;flex-wrap:wrap}
+.stat-item{display:flex;flex-direction:column;gap:.2rem}
+.stat-num{font-family:var(--font-d);font-size:1.6rem;color:var(--green-bright);line-height:1}
+.stat-label{font-family:var(--font-c);font-size:.62rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+@keyframes fade-up{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+.hero-right{position:relative;overflow:hidden}
+.hero-right img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center top}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(to right,var(--black) 0%,transparent 25%),linear-gradient(to top,rgba(5,5,5,.5) 0%,transparent 40%);z-index:1}
+.hero-spin-badge{position:absolute;bottom:2rem;right:2rem;z-index:2;width:86px;height:86px;border:1px solid rgba(76,206,76,.5);border-radius:50%;display:flex;align-items:center;justify-content:center;animation:spin 14s linear infinite}
+.hero-spin-badge span{font-family:var(--font-c);font-weight:800;font-size:.55rem;letter-spacing:.18em;text-transform:uppercase;color:var(--green-bright);text-align:center;line-height:1.5}
+@keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+
+/* CAT STRIP */
+.cat-strip{border-top:1px solid var(--border);border-bottom:1px solid var(--border);display:flex;overflow-x:auto;scrollbar-width:none;background:var(--near-black)}
+.cat-strip::-webkit-scrollbar{display:none}
+.cat-btn{flex:0 0 auto;font-family:var(--font-c);font-weight:700;font-size:.73rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);padding:1.1rem 2rem;border-right:1px solid var(--border);transition:color var(--trans),background var(--trans);white-space:nowrap}
+.cat-btn:hover,.cat-btn.active{color:var(--green-bright);background:var(--green-dim)}
+
+/* PREORDER BAND */
+.preorder-band{background:var(--near-black);border-bottom:1px solid rgba(76,206,76,.25);padding:1.3rem clamp(1.2rem,5vw,3.5rem);display:flex;align-items:center;justify-content:space-between;gap:1rem;flex-wrap:wrap;position:relative;overflow:hidden}
+.preorder-band::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--green-bright)}
+.preorder-band::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at left,rgba(76,206,76,.06),transparent 60%)}
+.preorder-txt{position:relative;z-index:1}
+.preorder-label{font-family:var(--font-c);font-weight:800;font-size:.68rem;letter-spacing:.28em;text-transform:uppercase;color:var(--green-bright);margin-bottom:.2rem}
+.preorder-heading{font-family:var(--font-d);font-size:clamp(1.2rem,3vw,1.8rem);text-transform:uppercase;letter-spacing:.05em}
+.preorder-band .btn-primary{position:relative;z-index:1;flex-shrink:0}
+
+/* SHOP */
+.shop-section{padding:clamp(3rem,6vw,5rem) clamp(1.2rem,5vw,3.5rem)}
+.shop-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:2.5rem;flex-wrap:wrap;gap:1rem}
+.view-all{font-family:var(--font-c);font-weight:700;font-size:.72rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);transition:color var(--trans)}
+.view-all:hover{color:var(--green-bright)}
+.products-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:2px}
+.prod-card{background:var(--card);position:relative;overflow:hidden;cursor:pointer}
+.prod-card::after{content:'';position:absolute;inset:0;border:1px solid transparent;transition:border-color var(--trans);pointer-events:none;z-index:3}
+.prod-card:hover::after{border-color:var(--green-bright)}
+.prod-img-wrap{aspect-ratio:3/4;position:relative;overflow:hidden;background:var(--card)}
+.prod-img-wrap img{width:100%;height:100%;object-fit:cover;object-position:center top;transition:transform .6s ease}
+.prod-card:hover .prod-img-wrap img{transform:scale(1.06)}
+.prod-badge{position:absolute;top:.9rem;left:.9rem;font-family:var(--font-c);font-weight:800;font-size:.63rem;letter-spacing:.15em;text-transform:uppercase;background:var(--green-bright);color:var(--black);padding:.28rem .65rem;z-index:2}
+.prod-quick{position:absolute;bottom:0;left:0;right:0;background:var(--green-bright);color:var(--black);font-family:var(--font-c);font-weight:800;font-size:.73rem;letter-spacing:.2em;text-transform:uppercase;text-align:center;padding:.75rem;transform:translateY(100%);transition:transform .3s ease;z-index:2}
+.prod-card:hover .prod-quick{transform:translateY(0)}
+.prod-info{padding:1.1rem}
+.prod-name{font-family:var(--font-c);font-weight:700;font-size:.95rem;letter-spacing:.06em;text-transform:uppercase;margin-bottom:.25rem}
+.prod-sub{font-size:.73rem;color:var(--muted);margin-bottom:.7rem}
+.prod-pricing{display:flex;align-items:baseline;gap:.5rem}
+.prod-price{font-family:var(--font-d);font-size:1.15rem;color:var(--green-bright);letter-spacing:.04em}
+
+/* FEATURED BANNER */
+.feat-banner{display:grid;grid-template-columns:1fr 1fr;min-height:520px;border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+.feat-content{display:flex;flex-direction:column;justify-content:center;padding:clamp(3rem,6vw,5rem) clamp(1.2rem,5vw,3.5rem);background:var(--near-black);position:relative;overflow:hidden}
+.feat-content .watermark{position:absolute;right:-1rem;top:50%;transform:translateY(-50%);font-family:var(--font-d);font-size:10rem;color:rgba(255,255,255,.02);line-height:1;pointer-events:none;user-select:none}
+.feat-title{font-family:var(--font-d);font-size:clamp(3rem,6vw,5.5rem);line-height:.9;text-transform:uppercase;margin-bottom:1.3rem}
+.feat-desc{font-size:.9rem;color:var(--muted);line-height:1.8;max-width:360px;margin-bottom:2rem}
+.feat-img{position:relative;overflow:hidden;min-height:300px}
+.feat-img img{width:100%;height:100%;object-fit:cover;object-position:center top;transition:transform 5s ease}
+.feat-banner:hover .feat-img img{transform:scale(1.04)}
+.feat-img-overlay{position:absolute;inset:0;background:linear-gradient(to right,var(--near-black),transparent 25%);z-index:1}
+
+/* LOOKBOOK */
+.lookbook-section{background:var(--near-black);border-top:1px solid var(--border);padding:clamp(3rem,6vw,5rem) clamp(1.2rem,5vw,3.5rem)}
+.lookbook-grid{display:grid;grid-template-columns:repeat(4,1fr);grid-template-rows:repeat(2,220px);gap:3px;margin-top:2rem}
+.lb-item{position:relative;overflow:hidden;cursor:pointer}
+.lb-item:first-child{grid-column:span 2;grid-row:span 2}
+.lb-item img{width:100%;height:100%;object-fit:cover;object-position:center top;transition:transform .6s ease}
+.lb-item:hover img{transform:scale(1.06)}
+.lb-overlay{position:absolute;inset:0;background:rgba(5,5,5,.55);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .3s;z-index:2}
+.lb-item:hover .lb-overlay{opacity:1}
+.lb-overlay span{font-family:var(--font-d);font-size:1rem;letter-spacing:.2em;text-transform:uppercase;color:var(--green-bright)}
+
+/* ABOUT */
+.about-section{padding:clamp(3rem,6vw,5rem) clamp(1.2rem,5vw,3.5rem)}
+.about-grid{display:grid;grid-template-columns:1fr 1fr;gap:4.5rem;align-items:center}
+.about-media{position:relative}
+.about-img-main{aspect-ratio:4/5;position:relative;overflow:hidden}
+.about-img-main img{width:100%;height:100%;object-fit:cover;object-position:center top}
+.about-corner{position:absolute;bottom:-1.5rem;right:-1.5rem;width:55%;aspect-ratio:1;border:1px solid rgba(76,206,76,.3);z-index:-1}
+.about-glow{position:absolute;top:-3rem;left:-3rem;width:220px;height:220px;background:radial-gradient(circle,rgba(76,206,76,.15),transparent 70%);pointer-events:none}
+.about-text{display:flex;flex-direction:column;gap:1.4rem}
+.about-headline{font-family:var(--font-d);font-size:clamp(2.8rem,4.5vw,4rem);line-height:.92;text-transform:uppercase}
+.about-body{font-size:.9rem;color:var(--muted);line-height:1.85}
+.about-pills{display:flex;gap:.5rem;flex-wrap:wrap}
+.pill{font-family:var(--font-c);font-weight:700;font-size:.68rem;letter-spacing:.15em;text-transform:uppercase;padding:.38rem .9rem;border:1px solid var(--border);color:var(--muted);transition:all .2s}
+.pill:hover{border-color:var(--green-bright);color:var(--green-bright)}
+.about-contact-info{display:flex;flex-direction:column;gap:.7rem;padding-top:.5rem;border-top:1px solid var(--border)}
+.contact-row{display:flex;align-items:center;gap:.7rem;font-size:.85rem;color:var(--muted)}
+.contact-row svg{color:var(--green-bright);flex-shrink:0}
+.contact-row a{color:var(--white);transition:color var(--trans)}
+.contact-row a:hover{color:var(--green-bright)}
+
+/* CONTACT */
+.contact-section{background:var(--near-black);border-top:1px solid var(--border);padding:clamp(3rem,6vw,5rem) clamp(1.2rem,5vw,3.5rem)}
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start}
+.contact-form-wrap{display:flex;flex-direction:column;gap:1.2rem}
+.form-group{display:flex;flex-direction:column;gap:.45rem}
+.form-label{font-family:var(--font-c);font-weight:700;font-size:.7rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.form-input,.form-textarea{background:var(--black);border:1px solid var(--border);color:var(--white);font-size:.9rem;padding:.85rem 1.1rem;outline:none;width:100%;transition:border-color var(--trans)}
+.form-input:focus,.form-textarea:focus{border-color:var(--green-bright)}
+.form-textarea{resize:vertical;min-height:110px}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.contact-info-col{display:flex;flex-direction:column;gap:2rem}
+.contact-box{background:var(--black);border:1px solid var(--border);padding:1.5rem;display:flex;flex-direction:column;gap:.6rem;transition:border-color var(--trans)}
+.contact-box:hover{border-color:var(--green-bright)}
+.contact-box-icon{font-size:1.5rem;margin-bottom:.3rem}
+.contact-box-label{font-family:var(--font-c);font-weight:700;font-size:.7rem;letter-spacing:.22em;text-transform:uppercase;color:var(--green-bright)}
+.contact-box-value{font-size:.9rem;color:var(--white)}
+.contact-box-value a{transition:color var(--trans)}
+.contact-box-value a:hover{color:var(--green-bright)}
+.contact-box-note{font-size:.75rem;color:var(--muted)}
+.wa-cta-btn{display:flex;align-items:center;justify-content:center;gap:.6rem;width:100%;font-family:var(--font-c);font-weight:800;font-size:.82rem;letter-spacing:.18em;text-transform:uppercase;background:#25d366;color:#fff;padding:.9rem 1.5rem;margin-top:.5rem;transition:filter var(--trans)}
+.wa-cta-btn:hover{filter:brightness(1.15)}
+
+/* NEWSLETTER */
+.newsletter{background:var(--green-bright);color:var(--black);text-align:center;padding:clamp(3rem,6vw,4.5rem) clamp(1.2rem,5vw,3.5rem)}
+.newsletter-title{font-family:var(--font-d);font-size:clamp(2.2rem,5.5vw,4.5rem);text-transform:uppercase;line-height:.92;margin-bottom:.8rem}
+.newsletter-sub{font-family:var(--font-c);font-size:.8rem;letter-spacing:.2em;text-transform:uppercase;opacity:.6;margin-bottom:2rem}
+.newsletter-form{display:flex;max-width:460px;margin:0 auto}
+.newsletter-input{flex:1;font-size:.88rem;background:rgba(0,0,0,.12);border:2px solid rgba(0,0,0,.25);border-right:none;padding:.9rem 1.2rem;color:var(--black);outline:none}
+.newsletter-input::placeholder{color:rgba(0,0,0,.4)}
+.newsletter-submit{font-family:var(--font-c);font-weight:800;font-size:.78rem;letter-spacing:.2em;text-transform:uppercase;background:var(--black);color:var(--green-bright);border:2px solid var(--black);padding:.9rem 1.6rem;white-space:nowrap;transition:background .2s}
+.newsletter-submit:hover{background:#1a1a1a}
+
+.toast{position:fixed;bottom:2rem;left:50%;transform:translateX(-50%) translateY(80px);background:var(--green-bright);color:var(--black);font-family:var(--font-c);font-weight:800;font-size:.78rem;letter-spacing:.2em;text-transform:uppercase;padding:.75rem 2rem;z-index:9999;opacity:0;transition:all .35s ease;pointer-events:none}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.wa-float{position:fixed;bottom:2rem;right:2rem;z-index:850;width:54px;height:54px;background:#25d366;border-radius:50%;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 20px rgba(37,211,102,.4);transition:transform .2s,box-shadow .2s}
+.wa-float:hover{transform:scale(1.1);box-shadow:0 6px 28px rgba(37,211,102,.6)}
+.wa-float svg{width:26px;height:26px;fill:#fff}
+
+/* FOOTER */
+footer{background:var(--near-black);border-top:1px solid var(--border);padding:clamp(3rem,5vw,4rem) clamp(1.2rem,5vw,3.5rem) 1.8rem}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:2.5rem;margin-bottom:3rem}
+.footer-brand{font-family:var(--font-d);font-size:2.2rem;letter-spacing:.1em;margin-bottom:.6rem}
+.footer-brand span{color:var(--green-bright)}
+.footer-tagline{font-size:.83rem;color:var(--muted);line-height:1.75;max-width:250px;margin-bottom:1.3rem}
+.footer-socials{display:flex;gap:.6rem}
+.social-chip{width:34px;height:34px;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;font-family:var(--font-c);font-weight:700;font-size:.6rem;letter-spacing:.08em;color:var(--muted);text-transform:uppercase;transition:all .2s}
+.social-chip:hover{border-color:var(--green-bright);color:var(--green-bright)}
+.footer-col-title{font-family:var(--font-c);font-weight:700;font-size:.68rem;letter-spacing:.28em;text-transform:uppercase;color:var(--green-bright);margin-bottom:1rem}
+.footer-col ul{list-style:none;display:flex;flex-direction:column;gap:.65rem}
+.footer-col a{font-size:.83rem;color:var(--muted);transition:color var(--trans)}
+.footer-col a:hover{color:var(--white)}
+.footer-bottom{border-top:1px solid var(--border);padding-top:1.5rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem}
+.footer-copy{font-size:.73rem;color:var(--muted)}
+.footer-loc{font-family:var(--font-c);font-size:.68rem;letter-spacing:.18em;text-transform:uppercase;color:var(--muted)}
+
+/* MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.85);z-index:970;opacity:0;pointer-events:none;transition:opacity .3s;display:flex;align-items:center;justify-content:center;padding:1rem}
+.modal-bg.open{opacity:1;pointer-events:all}
+.modal{background:var(--near-black);border:1px solid var(--border);max-width:760px;width:100%;max-height:90svh;overflow-y:auto;display:grid;grid-template-columns:1fr 1fr}
+.modal-img{aspect-ratio:3/4;position:relative;background:var(--card);overflow:hidden;min-height:300px}
+.modal-img img{width:100%;height:100%;object-fit:cover;object-position:center top}
+.modal-content{padding:2rem;display:flex;flex-direction:column;gap:1rem}
+.modal-tag{font-family:var(--font-c);font-weight:700;font-size:.65rem;letter-spacing:.25em;text-transform:uppercase;color:var(--green-bright)}
+.modal-name{font-family:var(--font-d);font-size:1.8rem;text-transform:uppercase;letter-spacing:.05em;line-height:1}
+.modal-price{font-family:var(--font-d);font-size:1.4rem;color:var(--green-bright)}
+.modal-desc{font-size:.85rem;color:var(--muted);line-height:1.75}
+.modal-size-label{font-family:var(--font-c);font-weight:700;font-size:.68rem;letter-spacing:.2em;text-transform:uppercase;color:var(--muted)}
+.size-grid{display:flex;gap:.5rem;flex-wrap:wrap}
+.size-btn{font-family:var(--font-c);font-weight:700;font-size:.75rem;letter-spacing:.1em;padding:.45rem .9rem;border:1px solid var(--border);color:var(--muted);transition:all .2s}
+.size-btn:hover,.size-btn.active{border-color:var(--green-bright);color:var(--green-bright);background:var(--green-dim)}
+.modal-add-btn{width:100%;font-family:var(--font-c);font-weight:800;font-size:.82rem;letter-spacing:.2em;text-transform:uppercase;background:var(--green-bright);color:var(--black);padding:1rem;margin-top:auto;transition:box-shadow var(--trans)}
+.modal-add-btn:hover{box-shadow:var(--green-glow)}
+.modal-close{position:absolute;top:1rem;right:1rem;font-size:1.3rem;color:var(--muted);z-index:2;transition:color var(--trans)}
+.modal-close:hover{color:var(--green-bright)}
+.modal-inner{position:relative}
+
+@media(max-width:960px){
+  .nav-links{display:none}
+  .hamburger{display:flex}
+  .hero{grid-template-columns:1fr}
+  .hero-right{display:none}
+  .hero-left{min-height:100svh;justify-content:center;padding-top:100px}
+  .feat-banner{grid-template-columns:1fr}
+  .feat-img{order:-1;min-height:280px}
+  .feat-img-overlay{background:linear-gradient(to top,var(--near-black),transparent 50%)}
+  .about-grid{grid-template-columns:1fr;gap:2.5rem}
+  .about-corner{display:none}
+  .lookbook-grid{grid-template-columns:1fr 1fr;grid-template-rows:auto}
+  .lb-item:first-child{grid-column:span 2;grid-row:span 1}
+  .contact-grid{grid-template-columns:1fr}
+  .footer-grid{grid-template-columns:1fr 1fr;gap:2rem}
+  .modal{grid-template-columns:1fr}
+  .modal-img{aspect-ratio:16/9}
+}
+@media(max-width:560px){
+  .products-grid{grid-template-columns:1fr 1fr;gap:2px}
+  .lookbook-grid{grid-template-columns:1fr 1fr}
+  .footer-grid{grid-template-columns:1fr}
+  .newsletter-form{flex-direction:column}
+  .newsletter-input{border-right:2px solid rgba(0,0,0,.25)}
+  .hero-title{font-size:4.2rem}
+  .form-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="ticker">
+  <div class="ticker-track">
+    <span class="ticker-item">LIGHT IT UP</span><span class="ticker-item">WRLD BOUJEE COLLECTION</span><span class="ticker-item">PRE ORDER OPEN NOW</span><span class="ticker-item">GQ, SOUTH AFRICA 🇿🇦</span><span class="ticker-item">AESTHETIC STREETWEAR</span><span class="ticker-item">BOLD PRINTS. PREMIUM FABRIC.</span><span class="ticker-item">LIGHT IT UP</span><span class="ticker-item">WRLD BOUJEE COLLECTION</span><span class="ticker-item">PRE ORDER OPEN NOW</span><span class="ticker-item">GQ, SOUTH AFRICA 🇿🇦</span><span class="ticker-item">AESTHETIC STREETWEAR</span><span class="ticker-item">BOLD PRINTS. PREMIUM FABRIC.</span>
+  </div>
+</div>
+
+<nav id="mainNav">
+  <a href="#home" class="nav-logo">
+    <span class="nav-logo-text">LUM<span>.</span>WRLD</span>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#shop">Shop</a></li>
+    <li><a href="#lookbook">Lookbook</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="nav-right">
+    <a href="https://wa.me/27634805441" target="_blank" class="nav-whatsapp" title="WhatsApp us">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+    </a>
+    <button class="cart-btn" id="cartBtn">Bag<span class="cart-count" id="cartCount">0</span></button>
+    <button class="hamburger" id="hamburger" aria-label="Menu"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<div class="mobile-overlay" id="mobileOverlay">
+  <a href="#shop" class="mob-link">Shop</a>
+  <a href="#lookbook" class="mob-link">Lookbook</a>
+  <a href="#about" class="mob-link">About</a>
+  <a href="#contact" class="mob-link">Contact</a>
+  <div class="mob-contact">
+    <a href="tel:+27634805441">📞 063 480 5441</a>
+    <a href="mailto:lumw.store@gmail.com">✉ Email Us</a>
+  </div>
+</div>
+
+<div class="cart-overlay" id="cartOverlay"></div>
+<div class="cart-drawer" id="cartDrawer">
+  <div class="cart-drawer-head"><h3>Your Bag</h3><button class="cart-close" id="cartClose">✕</button></div>
+  <div class="cart-items" id="cartItems">
+    <div class="cart-empty" id="cartEmpty">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+      <p>Your bag is empty</p>
+    </div>
+  </div>
+  <div class="cart-footer" id="cartFooter" style="display:none">
+    <div class="cart-total-row"><span class="cart-total-label">Total</span><span class="cart-total-amt" id="cartTotal">R 0</span></div>
+    <button class="checkout-btn" id="checkoutBtn">Checkout via WhatsApp</button>
+    <p class="cart-wa-note">Orders processed via WhatsApp.<br>We'll confirm your order + payment details.</p>
+  </div>
+</div>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal" id="modalContent">
+    <div class="modal-img modal-inner">
+      <button class="modal-close" id="modalClose">✕</button>
+      <img id="modalImg" src="" alt="Product"/>
+    </div>
+    <div class="modal-content">
+      <span class="modal-tag" id="modalTag">Collection</span>
+      <h2 class="modal-name" id="modalName">Product Name</h2>
+      <div class="modal-price" id="modalPrice">R 0</div>
+      <p class="modal-desc" id="modalDesc">Description</p>
+      <div class="modal-size-label">Select Size</div>
+      <div class="size-grid"></div>
+      <button class="modal-add-btn" id="modalAddBtn">Add to Bag</button>
+    </div>
+  </div>
+</div>
+
+<section class="hero" id="home">
+  <div class="hero-glow"></div>
+  <div class="hero-left">
+    <div class="hero-eyebrow">New Drop — WRLD Boujee Collection</div>
+    <h1 class="hero-title">LIGHT<br><span class="lit">UP</span>MY<br>WRLD</h1>
+    <p class="hero-body">Bold prints. Premium fabrics. Built for those who move different. South African streetwear straight outta Gqeberha — wear your light.</p>
+    <div class="hero-ctas">
+      <a href="#shop" class="btn-primary">Shop Now ↓</a>
+      <a href="#lookbook" class="btn-ghost">View Lookbook</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item"><div class="stat-num">GQ</div><div class="stat-label">Home Base</div></div>
+      <div class="stat-item"><div class="stat-num">100%</div><div class="stat-label">Premium</div></div>
+      <div class="stat-item"><div class="stat-num">🌍</div><div class="stat-label">Light It Up</div></div>
+    </div>
+  </div>
+  <div class="hero-right">
+    <img src="https://raw.githubusercontent.com/justforher-code/lum.wrld/main/LUM.Wrld/scott%2002%20tee%20x%20lumw%20(front).jpg" alt="LUM.WRLD — Scott Tee"/>
+    <div class="hero-overlay"></div>
+    <div class="hero-spin-badge"><span>LIGHT<br>IT UP<br>✦</span></div>
+  </div>
+</section>
+
+<div class="cat-strip">
+  <button class="cat-btn active" data-cat="all">All Drops</button>
+  <button class="cat-btn" data-cat="boujee">WRLD Boujee</button>
+  <button class="cat-btn" data-cat="tees">Tees</button>
+  <button class="cat-btn" data-cat="hoodies">Hoodies</button>
+  <button class="cat-btn" data-cat="caps">Caps & Accessories</button>
+  <button class="cat-btn" data-cat="preorder">Pre-Order</button>
+</div>
+
+<div class="preorder-band">
+  <div class="preorder-txt">
+    <div class="preorder-label">⚡ Limited Drop — Pre-Order Now Open</div>
+    <div class="preorder-heading">WRLD Boujee — Season 01</div>
+  </div>
+  <a href="https://wa.me/27634805441?text=Hey%20lum.wrld!%20I'd%20like%20to%20pre-order%20WRLD%20Boujee%20Season%2001%20🔥" target="_blank" class="btn-primary">Pre-Order via WhatsApp</a>
+</div>
+
+<section class="shop-section" id="shop">
+  <div class="shop-header">
+    <div>
+      <div class="section-tag">Featured Drops</div>
+      <h2 class="section-title">New in<br><span class="neon">the WRLD</span></h2>
+    </div>
+    <a href="https://lumw.store" target="_blank" class="view-all">Visit Full Store →</a>
+  </div>
+  <div class="products-grid" id="productsGrid"></div>
+</section>
+
+<div class="feat-banner reveal">
+  <div class="feat-content">
+    <div class="watermark">WRLD</div>
+    <div class="section-tag">The Statement Collection</div>
+    <h2 class="feat-title">WRLD<br><span class="neon">BOUJEE</span><br>DROP</h2>
+    <p class="feat-desc">The collection for those who move different. Premium street-ready pieces inspired by Gqeberha's energy — built for the culture, worn by the bold.</p>
+    <a href="https://wa.me/27634805441?text=Hey!%20I%20want%20to%20cop%20something%20from%20the%20WRLD%20Boujee%20collection%20🔥" target="_blank" class="btn-primary">Shop on WhatsApp</a>
+  </div>
+  <div class="feat-img">
+    <img src="https://raw.githubusercontent.com/justforher-code/lum.wrld/main/LUM.Wrld/07d88a92-376c-49bc-bcf0-5f964811bb08.jpg" alt="WRLD Boujee Collection"/>
+    <div class="feat-img-overlay"></div>
+  </div>
+</div>
+
+<section class="lookbook-section reveal" id="lookbook">
+  <div style="display:flex;align-items:flex-end;justify-content:space-between;flex-wrap:wrap;gap:1rem">
+    <div><div class="section-tag">@lum.wrld</div><h2 class="section-title">Look<span class="neon">book</span></h2></div>
+    <a href="https://instagram.com/lum.wrld" target="_blank" class="view-all">Follow on IG →</a>
+  </div>
+  <div class="lookbook-grid">
+    <div class="lb-item">
+      <img src="https://raw.githubusercontent.com/justforher-code/lum.wrld/main/LUM.Wrld/lumw%20lookbook%201.jpg" alt="LUMW Lookbook 1"/>
+      <div class="lb-overlay"><span>@lum.wrld</span></div>
+    </div>
+    <div class="lb-item">
+      <img src="https://raw.githubusercontent.com/justforher-code/lum.wrld/main/LUM.Wrld/lookbook%202.jpg" alt="LUMW Lookbook 2"/>
+      <div class="lb-overlay"><span>@lum.wrld</span></div>
+    </div>
+    <div class="lb-item">
+      <img src="https://raw.githubusercontent.com/justforher-code/lum.wrld/main/LUM.Wrld/lookbook3.jpg" alt="LUMW Lookbook 3"/>
+      <div class="lb-overlay"><span>@lum.wrld</span></div>
+    </div>
+    <div class="lb-item">
+      <img src="https://raw.githubusercontent.com/justforher-code/lum.wrld/main/LUM.Wrld/lookbook4.jpg" alt="LUMW Lookbook 4"/>
+      <div class="lb-overlay"><span>@lum.wrld</span></div>
+    </div>
+    <div class="lb-item">
+      <img src="https://raw.githubusercontent.com/justforher-code/lum.wrld/main/LUM.Wrld/lookbook5.jpg" alt="LUMW Lookbook 5"/>
+      <div class="lb-overlay"><span>@lum.wrld</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="about-section reveal" id="about">
+  <div class="about-grid">
+    <div class="about-media">
+      <div class="about-glow"></div>
+      <div class="about-img-main">
+        <img src="https://raw.githubusercontent.com/justforher-code/lum.wrld/main/LUM.Wrld/lumw%20front%20and%20back%20scott%2002%20tee%20lookbook.jpg" alt="lum.wrld About"/>
+      </div>
+      <div class="about-corner"></div>
+    </div>
+    <div class="about-text">
+      <div><div class="section-tag">Our Story</div><div class="about-headline">WE LIGHT<br>UP THE<br><span class="neon">WRLD.</span></div></div>
+      <p class="about-body">Born in Gqeberha, built for the streets. lum.wrld is more than a clothing brand — it's a movement for those who carry their own light. We create bold, aesthetic streetwear that speaks to South African youth culture: unapologetic, original, and always heat.</p>
+      <p class="about-body">Every piece is designed to make you stand out. Premium fabrics, sharp prints, and that energy you can't fake. When you put it on — you light it up.</p>
+      <div class="about-pills">
+        <span class="pill">Gqeberha Born</span><span class="pill">Streetwear</span><span class="pill">SA Made</span><span class="pill">Premium</span><span class="pill">Aesthetic</span><span class="pill">Unisex</span>
+      </div>
+      <div class="about-contact-info">
+        <div class="contact-row">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          <span><a href="https://wa.me/27634805441" target="_blank">063 480 5441</a> — WhatsApp / Call</span>
+        </div>
+        <div class="contact-row">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+          <span><a href="mailto:lumw.store@gmail.com">lumw.store@gmail.com</a></span>
+        </div>
+      </div>
+      <a href="#shop" class="btn-primary" style="align-self:flex-start">Shop the Brand</a>
+    </div>
+  </div>
+</section>
+
+<section class="contact-section reveal" id="contact">
+  <div><div class="section-tag">Get in Touch</div><h2 class="section-title" style="margin-bottom:2.5rem">Hit Us<br><span class="neon">Up.</span></h2></div>
+  <div class="contact-grid">
+    <div class="contact-form-wrap">
+      <div class="form-row">
+        <div class="form-group"><label class="form-label">First Name</label><input type="text" class="form-input" placeholder="Sipho" id="fname"/></div>
+        <div class="form-group"><label class="form-label">Last Name</label><input type="text" class="form-input" placeholder="Nkosi" id="lname"/></div>
+      </div>
+      <div class="form-group"><label class="form-label">Email</label><input type="email" class="form-input" placeholder="you@email.com" id="cemail"/></div>
+      <div class="form-group"><label class="form-label">Phone / WhatsApp</label><input type="tel" class="form-input" placeholder="063 XXX XXXX" id="cphone"/></div>
+      <div class="form-group"><label class="form-label">Message</label><textarea class="form-textarea" placeholder="What are you looking for? Order enquiry, sizing, collabs..." id="cmessage"></textarea></div>
+      <button class="btn-primary" onclick="sendContactEmail()" style="width:100%;justify-content:center">Send Message →</button>
+    </div>
+    <div class="contact-info-col">
+      <div class="contact-box">
+        <div class="contact-box-icon">📞</div>
+        <div class="contact-box-label">Call / WhatsApp</div>
+        <div class="contact-box-value"><a href="tel:+27634805441">063 480 5441</a></div>
+        <div class="contact-box-note">Mon–Sat, 9am – 7pm</div>
+        <a href="https://wa.me/27634805441?text=Hey%20lum.wrld!%20I%20saw%20your%20website%20and%20I%27m%20interested%20in%20your%20pieces%20🔥" target="_blank" class="wa-cta-btn">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="white"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+          Chat on WhatsApp
+        </a>
+      </div>
+      <div class="contact-box"><div class="contact-box-icon">✉️</div><div class="contact-box-label">Email Us</div><div class="contact-box-value"><a href="mailto:lumw.store@gmail.com">lumw.store@gmail.com</a></div><div class="contact-box-note">We reply within 24 hours</div></div>
+      <div class="contact-box"><div class="contact-box-icon">📍</div><div class="contact-box-label">Based In</div><div class="contact-box-value">Gqeberha, Eastern Cape 🇿🇦</div><div class="contact-box-note">Delivery nationwide · SA only</div></div>
+      <div class="contact-box"><div class="contact-box-icon">📸</div><div class="contact-box-label">Follow the Drop</div><div class="contact-box-value"><a href="https://instagram.com/lum.wrld" target="_blank">@lum.wrld on Instagram</a></div><div class="contact-box-note">New drops posted first on IG</div></div>
+    </div>
+  </div>
+</section>
+
+<div class="newsletter">
+  <div class="newsletter-title">JOIN<br>THE WRLD</div>
+  <div class="newsletter-sub">Be first to cop new drops + exclusive deals</div>
+  <div class="newsletter-form">
+    <input type="email" class="newsletter-input" id="nlEmail" placeholder="Enter your email address"/>
+    <button class="newsletter-submit" onclick="subscribeNewsletter()">Light It Up</button>
+  </div>
+</div>
+
+<footer>
+  <div class="footer-grid">
+    <div>
+      <div class="footer-brand">LUM<span>.</span>WRLD</div>
+      <p class="footer-tagline">Aesthetic streetwear brand from Gqeberha, South Africa. Built for those who move different. Light it up. 🌍</p>
+      <div class="footer-socials">
+        <a href="https://instagram.com/lum.wrld" target="_blank" class="social-chip">IG</a>
+        <a href="https://wa.me/27634805441" target="_blank" class="social-chip">WA</a>
+        <a href="mailto:lumw.store@gmail.com" class="social-chip">✉</a>
+        <a href="tel:+27634805441" class="social-chip">☎</a>
+      </div>
+    </div>
+    <div class="footer-col"><div class="footer-col-title">Shop</div><ul><li><a href="#shop">All Products</a></li><li><a href="#shop">WRLD Boujee</a></li><li><a href="#shop">Tees</a></li><li><a href="#shop">Hoodies</a></li><li><a href="#shop">Accessories</a></li><li><a href="https://lumw.store" target="_blank">Full Store →</a></li></ul></div>
+    <div class="footer-col"><div class="footer-col-title">Help</div><ul><li><a href="https://wa.me/27634805441?text=Hi!%20I%20want%20to%20track%20my%20order" target="_blank">Track Order</a></li><li><a href="#contact">Size Guide</a></li><li><a href="#contact">Returns</a></li><li><a href="#contact">FAQ</a></li><li><a href="mailto:lumw.store@gmail.com">Contact Us</a></li></ul></div>
+    <div class="footer-col"><div class="footer-col-title">Brand</div><ul><li><a href="#about">About</a></li><li><a href="#lookbook">Lookbook</a></li><li><a href="https://instagram.com/lum.wrld" target="_blank">Instagram</a></li><li><a href="mailto:lumw.store@gmail.com">Collabs</a></li><li><a href="https://lumw.store" target="_blank">lumw.store</a></li></ul></div>
+  </div>
+  <div class="footer-bottom">
+    <div class="footer-copy">© 2025 lum.wrld — Light Up My Wrld. All rights reserved.</div>
+    <div class="footer-loc">📍 Gqeberha, Eastern Cape, South Africa 🇿🇦</div>
+  </div>
+</footer>
+
+<a href="https://wa.me/27634805441?text=Hey%20lum.wrld!%20I%20saw%20your%20website%20and%20want%20to%20shop%20🔥" target="_blank" class="wa-float" title="Chat on WhatsApp">
+  <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+</a>
+<div class="toast" id="toast"></div>
+
+<script>
+const RAW = 'https://raw.githubusercontent.com/justforher-code/lum.wrld/main/LUM.Wrld/';
+
+const PRODUCT_IMAGES = {
+  1: RAW + '4pf%20shorts.jpg',
+  2: RAW + 'lumw%20graphic%20tee.jpg',
+  3: RAW + 'lumw%20fitted%20cap.jpg',
+  4: RAW + 'lumw%20fitted%20cap.jpg',
+  5: RAW + 'angry%20youth%20tee.jpg',
+  6: RAW + 'lumw%20graphic%20tee2.jpg',
+  7: RAW + 'scott%2002%20tee%20x%20lumw%20(back).jpg',
+  8: RAW + 'scott%2002%20tee%20x%20lumw%20(front).jpg',
+};
+
+const PRODUCTS = [
+  {id:1,name:"4PF Shorts",sub:"Zip pockets / Premium Cotton",price:350,tag:"New Drop",cat:["all","boujee"],desc:"The iconic LUMW x 4PF shorts. Bold print on premium heavyweight cotton with zip pockets. Elastic waist with drawstring.",sizes:["XS","S","M","L","XL","XXL"]},
+  {id:2,name:"LUMW Graphic Tee",sub:"Oversized fit / Premium Cotton",price:350,tag:"Boujee",cat:["all","tees","boujee"],desc:"The signature LUMW tee with bold lightning graphic. Oversized fit on premium heavyweight cotton — built for the streets.",sizes:["XS","S","M","L","XL","XXL"]},
+  {id:3,name:"LUMW Snapback Cap",sub:"Snapback / Embroidered",price:250,tag:"New",cat:["all","caps","boujee"],desc:"Clean black snapback with embroidered LUMW logo front and globe emblem on the back. One size fits all.",sizes:["One Size"]},
+  {id:4,name:"LUMW Fitted Cap",sub:"Structured / Globe Logo",price:250,cat:["all","caps","boujee"],desc:"Structured fitted cap featuring the LUMW globe logo embroidery. Premium mesh construction. Sizes 57-58cm.",sizes:["57-58cm"]},
+  {id:5,name:"Angry Youth Tee",sub:"Oversized / Premium Cotton",price:350,tag:"Heat",cat:["all","tees","boujee"],desc:"Angry Youth Elite graphic tee. Heavy print on premium black cotton. Statement piece for the culture.",sizes:["XS","S","M","L","XL","XXL"]},
+  {id:6,name:"LUMW Hand Graphic Tee",sub:"Oversized / Premium Cotton",price:350,tag:"New Drop",cat:["all","tees","boujee"],desc:"LUMW globe-hand graphic tee. Bold white print on premium black cotton. 'My Head On Pressure' tagline.",sizes:["XS","S","M","L","XL","XXL"]},
+  {id:7,name:"Scott 02 Tee — Back",sub:"Oversized / Premium Cotton",price:350,tag:"Limited",cat:["all","tees","preorder"],desc:"The Scott 02 tee back detail. Script lettering with bold 02 numeral and 'light up my wrld even when everything burns' tagline.",sizes:["XS","S","M","L","XL","XXL"]},
+  {id:8,name:"Scott 02 Tee — Front",sub:"Oversized / Premium Cotton",price:350,tag:"New Drop",cat:["all","tees","preorder"],desc:"The Scott 02 tee front. LUMW wordmark with portrait graphic. Premium heavy cotton, oversized fit.",sizes:["XS","S","M","L","XL","XXL"]},
+];
+
+let cart=[],currentProduct=null,selectedSize="M";
+
+function renderProducts(filter="all"){
+  const grid=document.getElementById("productsGrid");
+  const filtered=filter==="all"?PRODUCTS:PRODUCTS.filter(p=>p.cat.includes(filter));
+  grid.innerHTML=filtered.map(p=>`
+    <div class="prod-card reveal" onclick="openModal(${p.id})">
+      <div class="prod-img-wrap">
+        ${p.tag?`<span class="prod-badge">${p.tag}</span>`:""}
+        <img src="${PRODUCT_IMAGES[p.id]}" alt="${p.name}" loading="lazy"/>
+        <button class="prod-quick" onclick="event.stopPropagation();addToCart(${p.id},'M')">+ Add to Bag</button>
+      </div>
+      <div class="prod-info">
+        <div class="prod-name">${p.name}</div>
+        <div class="prod-sub">${p.sub}</div>
+        <div class="prod-pricing"><span class="prod-price">R ${p.price.toLocaleString()}</span></div>
+      </div>
+    </div>`).join("");
+  observeReveal();
+}
+
+function openModal(id){
+  const p=PRODUCTS.find(x=>x.id===id);if(!p)return;
+  currentProduct=p;selectedSize=p.sizes[0]||"M";
+  document.getElementById("modalTag").textContent=p.tag||"lum.wrld";
+  document.getElementById("modalName").textContent=p.name;
+  document.getElementById("modalPrice").textContent=`R ${p.price.toLocaleString()}`;
+  document.getElementById("modalDesc").textContent=p.desc;
+  document.getElementById("modalImg").src=PRODUCT_IMAGES[p.id];
+  document.querySelector(".size-grid").innerHTML=p.sizes.map((s,i)=>`<button class="size-btn${i===0?" active":""}" onclick="selectSize(this)">${s}</button>`).join("");
+  document.getElementById("modalAddBtn").onclick=()=>{addToCart(p.id,selectedSize);closeModal();};
+  document.getElementById("modalBg").classList.add("open");
+  document.body.style.overflow="hidden";
+}
+
+function closeModal(){document.getElementById("modalBg").classList.remove("open");document.body.style.overflow="";}
+function selectSize(btn){document.querySelectorAll(".size-btn").forEach(b=>b.classList.remove("active"));btn.classList.add("active");selectedSize=btn.textContent;}
+
+function addToCart(id,size){
+  const p=PRODUCTS.find(x=>x.id===id);if(!p)return;
+  const key=`${id}-${size}`;const existing=cart.find(x=>x.key===key);
+  if(existing){existing.qty++;}else{cart.push({key,id,name:p.name,price:p.price,size,qty:1});}
+  updateCartUI();showToast(`${p.name} added to bag 🔥`);
+}
+
+function removeFromCart(key){cart=cart.filter(x=>x.key!==key);updateCartUI();}
+function changeQty(key,delta){const item=cart.find(x=>x.key===key);if(!item)return;item.qty+=delta;if(item.qty<=0)removeFromCart(key);else updateCartUI();}
+
+function updateCartUI(){
+  const count=cart.reduce((s,x)=>s+x.qty,0);
+  const total=cart.reduce((s,x)=>s+x.price*x.qty,0);
+  const countEl=document.getElementById("cartCount");
+  countEl.textContent=count;
+  count>0?countEl.classList.add("show"):countEl.classList.remove("show");
+  const itemsEl=document.getElementById("cartItems");
+  const emptyEl=document.getElementById("cartEmpty");
+  const footerEl=document.getElementById("cartFooter");
+  document.getElementById("cartTotal").textContent=`R ${total.toLocaleString()}`;
+  if(cart.length===0){emptyEl.style.display="flex";footerEl.style.display="none";itemsEl.innerHTML="";itemsEl.appendChild(emptyEl);}
+  else{
+    emptyEl.style.display="none";footerEl.style.display="block";
+    itemsEl.innerHTML=cart.map(item=>`
+      <div class="cart-item">
+        <div class="cart-item-img"><img src="${PRODUCT_IMAGES[item.id]}" alt="${item.name}"/></div>
+        <div class="cart-item-info">
+          <div class="cart-item-name">${item.name}</div>
+          <div class="cart-item-variant">Size: ${item.size}</div>
+          <div class="cart-qty"><button class="qty-btn" onclick="changeQty('${item.key}',-1)">−</button><span class="qty-num">${item.qty}</span><button class="qty-btn" onclick="changeQty('${item.key}',1)">+</button></div>
+          <div class="cart-item-price">R ${(item.price*item.qty).toLocaleString()}</div>
+          <button class="cart-item-remove" onclick="removeFromCart('${item.key}')">Remove</button>
+        </div>
+      </div>`).join("");
+  }
+}
+
+document.getElementById("checkoutBtn").addEventListener("click",()=>{
+  if(cart.length===0)return;
+  const total=cart.reduce((s,x)=>s+x.price*x.qty,0);
+  const lines=cart.map(x=>`• ${x.name} (Size: ${x.size}) x${x.qty} — R ${(x.price*x.qty).toLocaleString()}`).join("\n");
+  const msg=encodeURIComponent(`Hey lum.wrld! 🔥 I'd like to place an order:\n\n${lines}\n\nTotal: R ${total.toLocaleString()}\n\nPlease confirm availability and payment details. Thank you!`);
+  window.open(`https://wa.me/27634805441?text=${msg}`,"_blank");
+});
+
+function sendContactEmail(){
+  const name=`${document.getElementById("fname").value} ${document.getElementById("lname").value}`.trim();
+  const email=document.getElementById("cemail").value.trim();
+  const phone=document.getElementById("cphone").value.trim();
+  const message=document.getElementById("cmessage").value.trim();
+  if(!name||!message){showToast("Please fill in your name & message");return;}
+  const subject=encodeURIComponent(`lum.wrld enquiry from ${name}`);
+  const body=encodeURIComponent(`Name: ${name}\nEmail: ${email}\nPhone: ${phone}\n\nMessage:\n${message}`);
+  window.open(`mailto:lumw.store@gmail.com?subject=${subject}&body=${body}`,"_blank");
+  showToast("Opening your email client... 📨");
+}
+
+function subscribeNewsletter(){
+  const email=document.getElementById("nlEmail").value.trim();
+  if(!email||!email.includes("@")){showToast("Enter a valid email address");return;}
+  const subject=encodeURIComponent("Newsletter signup");
+  const body=encodeURIComponent(`Please add me to the lum.wrld newsletter.\n\nEmail: ${email}`);
+  window.open(`mailto:lumw.store@gmail.com?subject=${subject}&body=${body}`,"_blank");
+  document.getElementById("nlEmail").value="";
+  showToast("You're in the WRLD! 🌍🔥");
+}
+
+function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),2800);}
+
+function observeReveal(){
+  const els=document.querySelectorAll(".reveal:not(.visible)");
+  const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add("visible");obs.unobserve(e.target);}});},{threshold:0.08});
+  els.forEach(el=>obs.observe(el));
+}
+
+const nav=document.getElementById("mainNav");
+window.addEventListener("scroll",()=>{window.scrollY>50?nav.classList.add("scrolled"):nav.classList.remove("scrolled");});
+
+const hamburger=document.getElementById("hamburger");
+const mobileOverlay=document.getElementById("mobileOverlay");
+let menuOpen=false;
+hamburger.addEventListener("click",()=>{
+  menuOpen=!menuOpen;
+  mobileOverlay.classList.toggle("open",menuOpen);
+  const [s1,s2,s3]=hamburger.querySelectorAll("span");
+  if(menuOpen){s1.style.transform="translateY(7px) rotate(45deg)";s2.style.opacity="0";s3.style.transform="translateY(-7px) rotate(-45deg)";document.body.style.overflow="hidden";}
+  else{[s1,s2,s3].forEach(s=>{s.style.transform="";s.style.opacity=""});document.body.style.overflow="";}
+});
+document.querySelectorAll(".mob-link").forEach(link=>link.addEventListener("click",()=>{
+  menuOpen=false;mobileOverlay.classList.remove("open");
+  hamburger.querySelectorAll("span").forEach(s=>{s.style.transform="";s.style.opacity=""});
+  document.body.style.overflow="";
+}));
+
+document.querySelectorAll(".cat-btn").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".cat-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    renderProducts(btn.dataset.cat);
+  });
+});
+
+document.getElementById("cartBtn").addEventListener("click",openCart);
+document.getElementById("cartClose").addEventListener("click",closeCart);
+document.getElementById("cartOverlay").addEventListener("click",closeCart);
+document.getElementById("modalBg").addEventListener("click",e=>{if(e.target===document.getElementById("modalBg"))closeModal();});
+document.getElementById("modalClose").addEventListener("click",closeModal);
+
+function openCart(){document.getElementById("cartDrawer").classList.add("open");document.getElementById("cartOverlay").classList.add("open");document.body.style.overflow="hidden";}
+function closeCart(){document.getElementById("cartDrawer").classList.remove("open");document.getElementById("cartOverlay").classList.remove("open");document.body.style.overflow="";}
+
+renderProducts("all");
+observeReveal();
+</script>
+</body>
+</html>
