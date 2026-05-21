@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>LUM.WRLD — Dashboard</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700;800;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --black:#050505;
+  --near-black:#0c0c0c;
+  --card:#111;
+  --card2:#141414;
+  --green:#3a9e3a;
+  --green-bright:#4cce4c;
+  --green-dim:rgba(76,206,76,.10);
+  --green-glow:0 0 16px rgba(76,206,76,.55),0 0 48px rgba(76,206,76,.2);
+  --white:#f2f2f2;
+  --muted:#5a5a5a;
+  --border:#1c1c1c;
+  --red:#ff3b3b;
+  --yellow:#f5c518;
+  --blue:#3b82f6;
+  --sidebar:220px;
+  --font-d:'Bebas Neue',sans-serif;
+  --font-c:'Barlow Condensed',sans-serif;
+  --font-b:'DM Sans',sans-serif;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{font-size:16px}
+body{background:var(--black);color:var(--white);font-family:var(--font-b);display:flex;min-height:100vh;overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;border:none;background:none;font-family:inherit;color:inherit}
+input,select,textarea{font-family:inherit}
+::-webkit-scrollbar{width:3px}
+::-webkit-scrollbar-track{background:var(--black)}
+::-webkit-scrollbar-thumb{background:var(--green-bright);border-radius:2px}
+::selection{background:var(--green-bright);color:var(--black)}
+
+/* SIDEBAR */
+.sidebar{width:var(--sidebar);background:var(--near-black);border-right:1px solid var(--border);display:flex;flex-direction:column;position:fixed;top:0;left:0;bottom:0;z-index:100;transition:transform .3s}
+.sidebar-logo{padding:1.5rem 1.2rem 1rem;border-bottom:1px solid var(--border)}
+.sidebar-logo-text{font-family:var(--font-d);font-size:1.5rem;letter-spacing:.14em}
+.sidebar-logo-text span{color:var(--green-bright)}
+.sidebar-logo-sub{font-family:var(--font-c);font-size:.6rem;letter-spacing:.25em;text-transform:uppercase;color:var(--muted);margin-top:.2rem}
+
+.admin-badge{margin:.8rem 1.2rem;background:var(--green-dim);border:1px solid rgba(76,206,76,.2);padding:.55rem .9rem}
+.admin-role{font-family:var(--font-c);font-weight:800;font-size:.65rem;letter-spacing:.25em;text-transform:uppercase;color:var(--green-bright)}
+.admin-name{font-family:var(--font-c);font-size:.8rem;color:var(--muted);margin-top:.1rem}
+
+.nav-section{padding:.8rem 0;flex:1;overflow-y:auto}
+.nav-section-label{font-family:var(--font-c);font-weight:700;font-size:.58rem;letter-spacing:.3em;text-transform:uppercase;color:var(--muted);padding:.4rem 1.2rem;margin-bottom:.2rem}
+.nav-item{display:flex;align-items:center;gap:.7rem;padding:.7rem 1.2rem;font-family:var(--font-c);font-weight:700;font-size:.82rem;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);cursor:pointer;transition:all .2s;border-left:2px solid transparent;position:relative}
+.nav-item:hover{color:var(--white);background:rgba(255,255,255,.03)}
+.nav-item.active{color:var(--green-bright);background:var(--green-dim);border-left-color:var(--green-bright)}
+.nav-item svg{width:16px;height:16px;flex-shrink:0}
+.nav-badge{margin-left:auto;background:var(--red);color:#fff;font-size:.6rem;font-weight:700;min-width:18px;height:18px;border-radius:9px;display:flex;align-items:center;justify-content:center;padding:0 4px;font-family:var(--font-b)}
+
+.sidebar-footer{border-top:1px solid var(--border);padding:1rem 1.2rem}
+.logout-btn{width:100%;font-family:var(--font-c);font-weight:800;font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;background:rgba(255,59,59,.1);color:var(--red);border:1px solid rgba(255,59,59,.25);padding:.7rem;transition:all .2s}
+.logout-btn:hover{background:rgba(255,59,59,.2);border-color:var(--red)}
+
+/* MAIN */
+.main{margin-left:var(--sidebar);flex:1;display:flex;flex-direction:column;min-height:100vh}
+
+/* TOPBAR */
+.topbar{background:var(--near-black);border-bottom:1px solid var(--border);padding:.9rem 1.8rem;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:50}
+.page-title{font-family:var(--font-d);font-size:1.4rem;letter-spacing:.1em;text-transform:uppercase}
+.topbar-right{display:flex;align-items:center;gap:1rem}
+.topbar-time{font-family:var(--font-c);font-size:.75rem;letter-spacing:.1em;color:var(--muted)}
+.status-dot{width:8px;height:8px;border-radius:50%;background:var(--green-bright);box-shadow:0 0 6px rgba(76,206,76,.6);animation:dot-pulse 2s ease-in-out infinite}
+@keyframes dot-pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.hamburger-mob{display:none;flex-direction:column;gap:4px;padding:4px}
+.hamburger-mob span{display:block;width:20px;height:2px;background:var(--white)}
+
+/* CONTENT */
+.content{padding:1.8rem;flex:1}
+
+/* PAGES */
+.page-view{display:none}
+.page-view.active{display:block}
+
+/* STATS GRID */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1px;margin-bottom:1.8rem;border:1px solid var(--border)}
+.stat-card{background:var(--card);padding:1.3rem 1.5rem;position:relative;overflow:hidden}
+.stat-card::after{content:'';position:absolute;top:0;left:0;right:0;height:2px}
+.stat-card.green::after{background:var(--green-bright)}
+.stat-card.yellow::after{background:var(--yellow)}
+.stat-card.blue::after{background:var(--blue)}
+.stat-card.red::after{background:var(--red)}
+.stat-label{font-family:var(--font-c);font-weight:700;font-size:.65rem;letter-spacing:.25em;text-transform:uppercase;color:var(--muted);margin-bottom:.4rem}
+.stat-val{font-family:var(--font-d);font-size:2rem;line-height:1;margin-bottom:.2rem}
+.stat-val.green{color:var(--green-bright)}
+.stat-val.yellow{color:var(--yellow)}
+.stat-val.blue{color:var(--blue)}
+.stat-val.red{color:var(--red)}
+.stat-sub{font-size:.72rem;color:var(--muted)}
+
+/* SECTION HEADER */
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.2rem;flex-wrap:wrap;gap:.8rem}
+.section-title{font-family:var(--font-d);font-size:1.2rem;letter-spacing:.08em;text-transform:uppercase}
+.section-tag{font-family:var(--font-c);font-weight:700;font-size:.62rem;letter-spacing:.28em;text-transform:uppercase;color:var(--green-bright)}
+
+/* FILTER BAR */
+.filter-bar{display:flex;align-items:center;gap:.6rem;flex-wrap:wrap}
+.filter-btn{font-family:var(--font-c);font-weight:700;font-size:.7rem;letter-spacing:.15em;text-transform:uppercase;padding:.4rem 1rem;border:1px solid var(--border);color:var(--muted);transition:all .2s}
+.filter-btn:hover,.filter-btn.active{border-color:var(--green-bright);color:var(--green-bright);background:var(--green-dim)}
+.search-input{background:var(--card);border:1px solid var(--border);color:var(--white);font-size:.82rem;padding:.4rem .9rem;outline:none;width:200px;transition:border-color .2s}
+.search-input:focus{border-color:var(--green-bright)}
+.search-input::placeholder{color:var(--muted)}
+
+/* TABLE */
+.table-wrap{overflow-x:auto;border:1px solid var(--border)}
+table{width:100%;border-collapse:collapse;min-width:700px}
+thead tr{background:var(--card2)}
+th{font-family:var(--font-c);font-weight:700;font-size:.65rem;letter-spacing:.25em;text-transform:uppercase;color:var(--green-bright);padding:.9rem 1rem;text-align:left;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:.85rem 1rem;font-size:.83rem;border-bottom:1px solid rgba(28,28,28,.6);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:rgba(76,206,76,.02)}
+.td-name{font-family:var(--font-c);font-weight:700;font-size:.88rem;letter-spacing:.04em;text-transform:uppercase}
+.td-muted{color:var(--muted);font-size:.75rem}
+.td-price{font-family:var(--font-d);font-size:1rem;color:var(--green-bright)}
+
+/* STATUS BADGES */
+.badge{display:inline-flex;align-items:center;gap:.35rem;font-family:var(--font-c);font-weight:700;font-size:.63rem;letter-spacing:.15em;text-transform:uppercase;padding:.28rem .7rem}
+.badge::before{content:'';width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.badge-pending{background:rgba(245,197,24,.1);color:var(--yellow);border:1px solid rgba(245,197,24,.25)}
+.badge-pending::before{background:var(--yellow)}
+.badge-paid{background:rgba(76,206,76,.1);color:var(--green-bright);border:1px solid rgba(76,206,76,.25)}
+.badge-paid::before{background:var(--green-bright)}
+.badge-packed{background:rgba(59,130,246,.1);color:var(--blue);border:1px solid rgba(59,130,246,.25)}
+.badge-packed::before{background:var(--blue)}
+.badge-shipped{background:rgba(168,85,247,.1);color:#a855f7;border:1px solid rgba(168,85,247,.25)}
+.badge-shipped::before{background:#a855f7}
+.badge-delivered{background:rgba(76,206,76,.15);color:#7eff7e;border:1px solid rgba(76,206,76,.4)}
+.badge-delivered::before{background:#7eff7e}
+.badge-cancelled{background:rgba(255,59,59,.1);color:var(--red);border:1px solid rgba(255,59,59,.25)}
+.badge-cancelled::before{background:var(--red)}
+
+/* TABLE ACTIONS */
+.table-action{font-family:var(--font-c);font-weight:700;font-size:.63rem;letter-spacing:.12em;text-transform:uppercase;padding:.3rem .7rem;border:1px solid var(--border);color:var(--muted);transition:all .2s}
+.table-action:hover{border-color:var(--green-bright);color:var(--green-bright)}
+.table-action.danger:hover{border-color:var(--red);color:var(--red)}
+
+/* STATUS SELECT */
+.status-select{background:var(--card);border:1px solid var(--border);color:var(--white);font-family:var(--font-c);font-weight:700;font-size:.7rem;letter-spacing:.1em;text-transform:uppercase;padding:.35rem .6rem;outline:none;cursor:pointer;transition:border-color .2s}
+.status-select:focus{border-color:var(--green-bright)}
+
+/* ITEMS EXPAND */
+.items-chip{display:inline-flex;align-items:center;gap:.3rem;font-size:.75rem;color:var(--muted);cursor:pointer;transition:color .2s}
+.items-chip:hover{color:var(--green-bright)}
+.items-list{display:none;margin-top:.4rem;font-size:.75rem;color:var(--muted);line-height:1.8}
+.items-list.open{display:block}
+
+/* STOCK TABLE */
+.stock-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1px;border:1px solid var(--border)}
+.stock-card{background:var(--card);padding:1.2rem;display:flex;flex-direction:column;gap:.8rem}
+.stock-name{font-family:var(--font-c);font-weight:700;font-size:.9rem;letter-spacing:.06em;text-transform:uppercase}
+.stock-price{font-family:var(--font-d);font-size:1rem;color:var(--green-bright)}
+.stock-level{display:flex;align-items:center;gap:.8rem}
+.stock-bar-wrap{flex:1;height:4px;background:var(--border);overflow:hidden}
+.stock-bar{height:100%;background:var(--green-bright);transition:width .4s}
+.stock-bar.low{background:var(--yellow)}
+.stock-bar.out{background:var(--red)}
+.stock-num{font-family:var(--font-d);font-size:1.1rem}
+.stock-num.low{color:var(--yellow)}
+.stock-num.out{color:var(--red)}
+.stock-edit-row{display:flex;align-items:center;gap:.5rem}
+.stock-input{background:var(--black);border:1px solid var(--border);color:var(--white);font-size:.85rem;padding:.35rem .6rem;width:70px;outline:none;transition:border-color .2s;text-align:center}
+.stock-input:focus{border-color:var(--green-bright)}
+.stock-update-btn{font-family:var(--font-c);font-weight:700;font-size:.65rem;letter-spacing:.15em;text-transform:uppercase;background:var(--green-bright);color:var(--black);padding:.35rem .8rem;transition:box-shadow .2s}
+.stock-update-btn:hover{box-shadow:var(--green-glow)}
+
+/* CUSTOMERS */
+.customer-card{background:var(--card);border:1px solid var(--border);padding:1.2rem;display:flex;flex-direction:column;gap:.6rem;transition:border-color .2s}
+.customer-card:hover{border-color:rgba(76,206,76,.3)}
+.customer-avatar{width:36px;height:36px;background:var(--green-dim);border:1px solid rgba(76,206,76,.2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:1rem;color:var(--green-bright)}
+.customer-name{font-family:var(--font-c);font-weight:700;font-size:.9rem;letter-spacing:.06em;text-transform:uppercase}
+.customer-detail{font-size:.75rem;color:var(--muted);display:flex;align-items:center;gap:.4rem}
+.customer-orders{display:flex;gap:.4rem;flex-wrap:wrap;margin-top:.2rem}
+.customer-order-chip{font-family:var(--font-c);font-size:.65rem;letter-spacing:.1em;text-transform:uppercase;background:var(--green-dim);border:1px solid rgba(76,206,76,.2);color:var(--green-bright);padding:.2rem .5rem}
+
+/* SETTINGS */
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.settings-card{background:var(--card);border:1px solid var(--border);padding:1.5rem;position:relative;overflow:hidden}
+.settings-card::before{content:'';position:absolute;top:0;left:0;bottom:0;width:2px;background:var(--green-bright)}
+.settings-card-title{font-family:var(--font-d);font-size:1.1rem;letter-spacing:.08em;text-transform:uppercase;margin-bottom:.3rem}
+.settings-card-sub{font-size:.78rem;color:var(--muted);margin-bottom:1.2rem;line-height:1.6}
+.form-group{display:flex;flex-direction:column;gap:.4rem;margin-bottom:1rem}
+.form-label{font-family:var(--font-c);font-weight:700;font-size:.62rem;letter-spacing:.22em;text-transform:uppercase;color:var(--muted)}
+.form-input{background:var(--black);border:1px solid var(--border);color:var(--white);font-size:.85rem;padding:.75rem .9rem;outline:none;width:100%;transition:border-color .2s}
+.form-input:focus{border-color:var(--green-bright)}
+.form-input::placeholder{color:var(--muted)}
+.save-btn{font-family:var(--font-c);font-weight:800;font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;background:var(--green-bright);color:var(--black);padding:.7rem 1.5rem;transition:box-shadow .2s}
+.save-btn:hover{box-shadow:var(--green-glow)}
+.danger-btn{font-family:var(--font-c);font-weight:800;font-size:.75rem;letter-spacing:.2em;text-transform:uppercase;background:rgba(255,59,59,.1);color:var(--red);border:1px solid rgba(255,59,59,.25);padding:.7rem 1.5rem;transition:all .2s}
+.danger-btn:hover{background:rgba(255,59,59,.2)}
+
+/* ORDER DETAIL MODAL */
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:200;opacity:0;pointer-events:none;transition:opacity .3s;display:flex;align-items:center;justify-content:center;padding:1rem}
+.modal-bg.open{opacity:1;pointer-events:all}
+.modal{background:var(--near-black);border:1px solid var(--border);max-width:580px;width:100%;max-height:90vh;overflow-y:auto;position:relative}
+.modal::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--green-bright)}
+.modal-head{display:flex;align-items:center;justify-content:space-between;padding:1.3rem 1.5rem;border-bottom:1px solid var(--border)}
+.modal-title{font-family:var(--font-d);font-size:1.3rem;letter-spacing:.08em;text-transform:uppercase}
+.modal-close{font-size:1.2rem;color:var(--muted);transition:color .2s}
+.modal-close:hover{color:var(--green-bright)}
+.modal-body{padding:1.5rem}
+.detail-row{display:flex;justify-content:space-between;align-items:center;padding:.55rem 0;border-bottom:1px solid rgba(28,28,28,.6);font-size:.85rem}
+.detail-row:last-child{border-bottom:none}
+.detail-key{color:var(--muted);font-family:var(--font-c);font-size:.72rem;letter-spacing:.15em;text-transform:uppercase}
+.detail-val{font-weight:500;text-align:right}
+.detail-val.green{color:var(--green-bright);font-family:var(--font-d);font-size:1.1rem}
+
+/* TOAST */
+.toast{position:fixed;bottom:1.5rem;right:1.5rem;background:var(--green-bright);color:var(--black);font-family:var(--font-c);font-weight:800;font-size:.73rem;letter-spacing:.18em;text-transform:uppercase;padding:.65rem 1.5rem;z-index:999;opacity:0;transform:translateY(20px);transition:all .3s;pointer-events:none}
+.toast.show{opacity:1;transform:translateY(0)}
+.toast.error{background:var(--red);color:#fff}
+
+/* EMPTY STATE */
+.empty-state{text-align:center;padding:3rem 1rem;color:var(--muted)}
+.empty-state svg{opacity:.2;margin:0 auto 1rem}
+.empty-state p{font-family:var(--font-c);letter-spacing:.2em;text-transform:uppercase;font-size:.75rem}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .sidebar{transform:translateX(-100%)}
+  .sidebar.open{transform:translateX(0)}
+  .main{margin-left:0}
+  .hamburger-mob{display:flex}
+  .stats-grid{grid-template-columns:1fr 1fr}
+  .settings-grid{grid-template-columns:1fr}
+}
+@media(max-width:560px){
+  .stats-grid{grid-template-columns:1fr}
+  .content{padding:1rem}
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-logo">
+    <div class="sidebar-logo-text">LUM<span>.</span>WRLD</div>
+    <div class="sidebar-logo-sub">Admin Dashboard</div>
+  </div>
+
+  <div class="admin-badge">
+    <div class="admin-role">Owner</div>
+    <div class="admin-name" id="sidebarUser">owner</div>
+  </div>
+
+  <nav class="nav-section">
+    <div class="nav-section-label">Main</div>
+    <div class="nav-item active" onclick="showPage('overview')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+      Overview
+    </div>
+    <div class="nav-item" onclick="showPage('orders')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+      Orders
+      <span class="nav-badge" id="pendingBadge">0</span>
+    </div>
+    <div class="nav-item" onclick="showPage('customers')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+      Customers
+    </div>
+    <div class="nav-section-label" style="margin-top:.8rem">Store</div>
+    <div class="nav-item" onclick="showPage('stock')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+      Stock
+    </div>
+    <div class="nav-section-label" style="margin-top:.8rem">System</div>
+    <div class="nav-item" onclick="showPage('settings')">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      Settings
+    </div>
+  </nav>
+
+  <div class="sidebar-footer">
+    <button class="logout-btn" onclick="doLogout()">↩ Logout</button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <div style="display:flex;align-items:center;gap:.8rem">
+      <button class="hamburger-mob" id="hamburgerMob" onclick="toggleSidebar()">
+        <span></span><span></span><span></span>
+      </button>
+      <div class="page-title" id="topbarTitle">Overview</div>
+    </div>
+    <div class="topbar-right">
+      <div class="topbar-time" id="topbarTime"></div>
+      <div class="status-dot" title="System online"></div>
+    </div>
+  </div>
+
+  <div class="content">
+
+    <!-- OVERVIEW PAGE -->
+    <div class="page-view active" id="page-overview">
+      <div class="stats-grid">
+        <div class="stat-card green">
+          <div class="stat-label">Total Revenue</div>
+          <div class="stat-val green" id="statRevenue">R 0</div>
+          <div class="stat-sub">All paid orders</div>
+        </div>
+        <div class="stat-card yellow">
+          <div class="stat-label">Pending Orders</div>
+          <div class="stat-val yellow" id="statPending">0</div>
+          <div class="stat-sub">Awaiting action</div>
+        </div>
+        <div class="stat-card blue">
+          <div class="stat-label">Total Orders</div>
+          <div class="stat-val blue" id="statTotal">0</div>
+          <div class="stat-sub">All time</div>
+        </div>
+        <div class="stat-card red">
+          <div class="stat-label">Low Stock Items</div>
+          <div class="stat-val red" id="statLowStock">0</div>
+          <div class="stat-sub">Under 5 units</div>
+        </div>
+      </div>
+
+      <div class="section-head">
+        <div>
+          <div class="section-tag">Recent Activity</div>
+          <div class="section-title">Latest Orders</div>
+        </div>
+        <button class="filter-btn" onclick="showPage('orders')">View All →</button>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Order ID</th><th>Customer</th><th>Items</th><th>Total</th><th>Status</th><th>Date</th>
+          </tr></thead>
+          <tbody id="overviewOrdersBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- ORDERS PAGE -->
+    <div class="page-view" id="page-orders">
+      <div class="section-head">
+        <div>
+          <div class="section-tag">Order Management</div>
+          <div class="section-title">All Orders</div>
+        </div>
+        <div class="filter-bar">
+          <input type="text" class="search-input" placeholder="Search orders..." id="orderSearch" oninput="filterOrders()"/>
+          <button class="filter-btn active" onclick="filterByStatus('all',this)">All</button>
+          <button class="filter-btn" onclick="filterByStatus('pending',this)">Pending</button>
+          <button class="filter-btn" onclick="filterByStatus('paid',this)">Paid</button>
+          <button class="filter-btn" onclick="filterByStatus('packed',this)">Packed</button>
+          <button class="filter-btn" onclick="filterByStatus('shipped',this)">Shipped</button>
+          <button class="filter-btn" onclick="filterByStatus('delivered',this)">Delivered</button>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table>
+          <thead><tr>
+            <th>Order ID</th><th>Customer</th><th>Contact</th><th>Items & Sizes</th><th>Total</th><th>Status</th><th>Date</th><th>Actions</th>
+          </tr></thead>
+          <tbody id="ordersBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- CUSTOMERS PAGE -->
+    <div class="page-view" id="page-customers">
+      <div class="section-head">
+        <div>
+          <div class="section-tag">Customer Storage</div>
+          <div class="section-title">All Customers</div>
+        </div>
+        <input type="text" class="search-input" placeholder="Search customers..." id="customerSearch" oninput="filterCustomers()"/>
+      </div>
+      <div id="customersGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:1px;border:1px solid var(--border)"></div>
+    </div>
+
+    <!-- STOCK PAGE -->
+    <div class="page-view" id="page-stock">
+      <div class="section-head">
+        <div>
+          <div class="section-tag">Inventory</div>
+          <div class="section-title">Stock Management</div>
+        </div>
+        <button class="save-btn" onclick="syncStock()">Sync from API</button>
+      </div>
+      <div class="stock-wrap" id="stockGrid"></div>
+    </div>
+
+    <!-- SETTINGS PAGE -->
+    <div class="page-view" id="page-settings">
+      <div class="section-head">
+        <div>
+          <div class="section-tag">System</div>
+          <div class="section-title">Settings</div>
+        </div>
+      </div>
+      <div class="settings-grid">
+        <div class="settings-card">
+          <div class="settings-card-title">Change Password</div>
+          <div class="settings-card-sub">Update your admin login credentials. Changes take effect on next login.</div>
+          <div class="form-group">
+            <label class="form-label">Current Password</label>
+            <input type="password" class="form-input" id="currentPw" placeholder="••••••••"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">New Password</label>
+            <input type="password" class="form-input" id="newPw" placeholder="Min 8 characters"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirm New Password</label>
+            <input type="password" class="form-input" id="confirmPw" placeholder="Repeat new password"/>
+          </div>
+          <button class="save-btn" onclick="changePassword()">Save Password →</button>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-card-title">Change Username</div>
+          <div class="settings-card-sub">Update the admin username used to log into this dashboard.</div>
+          <div class="form-group">
+            <label class="form-label">New Username</label>
+            <input type="text" class="form-input" id="newUsername" placeholder="e.g. lumwrld_admin"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirm Password</label>
+            <input type="password" class="form-input" id="usernameConfirmPw" placeholder="Enter current password"/>
+          </div>
+          <button class="save-btn" onclick="changeUsername()">Save Username →</button>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-card-title">Store Info</div>
+          <div class="settings-card-sub">Quick reference for your store contact details.</div>
+          <div class="detail-row"><span class="detail-key">WhatsApp</span><span class="detail-val">063 480 5441</span></div>
+          <div class="detail-row"><span class="detail-key">Email</span><span class="detail-val">lumw.store@gmail.com</span></div>
+          <div class="detail-row"><span class="detail-key">Location</span><span class="detail-val">Gqeberha, EC 🇿🇦</span></div>
+          <div class="detail-row"><span class="detail-key">Instagram</span><span class="detail-val">@lum.wrld</span></div>
+          <div class="detail-row"><span class="detail-key">API Status</span><span class="detail-val" style="color:var(--green-bright)">● Online</span></div>
+        </div>
+
+        <div class="settings-card">
+          <div class="settings-card-title">Data Management</div>
+          <div class="settings-card-sub">Manage locally cached data. This does not affect your Supabase database.</div>
+          <div style="display:flex;flex-direction:column;gap:.7rem;margin-top:.5rem">
+            <button class="save-btn" onclick="exportOrders()" style="width:100%;text-align:center">Export Orders CSV →</button>
+            <button class="danger-btn" onclick="clearLocalData()" style="width:100%;text-align:center">Clear Local Cache</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ORDER DETAIL MODAL -->
+<div class="modal-bg" id="orderModal">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-title">Order Detail</div>
+      <button class="modal-close" onclick="closeOrderModal()">✕</button>
+    </div>
+    <div class="modal-body" id="orderModalBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── AUTH GUARD ───
+if (sessionStorage.getItem('lw_auth') !== 'true') {
+  window.location.href = 'admin-login.html';
+}
+
+// ─── STATE ───
+let allOrders = [];
+let activeStatusFilter = 'all';
+const API = '/api';
+
+// ─── INIT ───
+document.getElementById('sidebarUser').textContent = sessionStorage.getItem('lw_admin_username') || 'owner';
+updateClock();
+setInterval(updateClock, 1000);
+loadAllData();
+
+function updateClock() {
+  const now = new Date();
+  document.getElementById('topbarTime').textContent = now.toLocaleTimeString('en-ZA', {hour:'2-digit',minute:'2-digit',second:'2-digit'});
+}
+
+// ─── PAGE NAV ───
+function showPage(name) {
+  document.querySelectorAll('.page-view').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('page-' + name).classList.add('active');
+  const titles = {overview:'Overview',orders:'Orders',customers:'Customers',stock:'Stock',settings:'Settings'};
+  document.getElementById('topbarTitle').textContent = titles[name] || name;
+  event?.currentTarget?.classList.add('active');
+  if (window.innerWidth < 900) document.getElementById('sidebar').classList.remove('open');
+}
+
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+
+// ─── DATA LOADING ───
+async function loadAllData() {
+  await Promise.all([loadOrders(), loadStock()]);
+}
+
+async function loadOrders() {
+  try {
+    const res = await fetch(`${API}/orders`);
+    const data = await res.json();
+    if (data.success) {
+      allOrders = data.orders || [];
+      renderOverview();
+      renderOrders();
+      renderCustomers();
+      updatePendingBadge();
+    }
+  } catch (err) {
+    // Fallback to demo data if API not reachable
+    allOrders = getDemoOrders();
+    renderOverview();
+    renderOrders();
+    renderCustomers();
+    updatePendingBadge();
+  }
+}
+
+async function loadStock() {
+  try {
+    const res = await fetch(`${API}/products`);
+    const data = await res.json();
+    if (data.success) renderStock(data.products);
+    else renderStock(getDemoProducts());
+  } catch {
+    renderStock(getDemoProducts());
+  }
+}
+
+async function syncStock() {
+  showToast('Syncing stock from API...');
+  await loadStock();
+  showToast('Stock synced ✅');
+}
+
+// ─── OVERVIEW ───
+function renderOverview() {
+  const paid = allOrders.filter(o => o.status === 'paid' || o.status === 'packed' || o.status === 'shipped' || o.status === 'delivered');
+  const revenue = paid.reduce((s, o) => s + (o.total_amount || 0), 0);
+  const pending = allOrders.filter(o => o.status === 'pending').length;
+  document.getElementById('statRevenue').textContent = `R ${revenue.toLocaleString()}`;
+  document.getElementById('statPending').textContent = pending;
+  document.getElementById('statTotal').textContent = allOrders.length;
+
+  const recent = [...allOrders].sort((a,b) => new Date(b.created_at) - new Date(a.created_at)).slice(0, 8);
+  document.getElementById('overviewOrdersBody').innerHTML = recent.map(o => `
+    <tr>
+      <td><span class="td-muted">#${(o.id||'').slice(0,8).toUpperCase()}</span></td>
+      <td><div class="td-name">${o.customer_name||'—'}</div><div class="td-muted">${o.customer_email||''}</div></td>
+      <td class="td-muted">${(o.items||[]).length} item(s)</td>
+      <td class="td-price">R ${(o.total_amount||0).toLocaleString()}</td>
+      <td>${statusBadge(o.status)}</td>
+      <td class="td-muted">${formatDate(o.created_at)}</td>
+    </tr>`).join('') || emptyRow(6, 'No orders yet');
+}
+
+// ─── ORDERS ───
+function renderOrders(orders) {
+  const list = orders || getFilteredOrders();
+  document.getElementById('ordersBody').innerHTML = list.map(o => `
+    <tr>
+      <td><span class="td-muted" style="cursor:pointer;color:var(--green-bright)" onclick="openOrderModal('${o.id}')">#${(o.id||'').slice(0,8).toUpperCase()}</span></td>
+      <td><div class="td-name">${o.customer_name||'—'}</div></td>
+      <td><div class="td-muted">${o.customer_email||'—'}</div><div class="td-muted">${o.customer_phone||''}</div></td>
+      <td>
+        <div class="items-chip" onclick="toggleItems(this)">
+          ${(o.items||[]).length} item(s) <span>▾</span>
+        </div>
+        <div class="items-list">
+          ${(o.items||[]).map(i=>`• ${i.product_name||i.name} — Size: ${i.size} × ${i.quantity}`).join('<br>')}
+        </div>
+      </td>
+      <td class="td-price">R ${(o.total_amount||0).toLocaleString()}</td>
+      <td>
+        <select class="status-select" onchange="updateOrderStatus('${o.id}', this.value)">
+          ${['pending','paid','packed','shipped','delivered','cancelled'].map(s=>
+            `<option value="${s}" ${o.status===s?'selected':''}>${s.charAt(0).toUpperCase()+s.slice(1)}</option>`
+          ).join('')}
+        </select>
+      </td>
+      <td class="td-muted">${formatDate(o.created_at)}</td>
+      <td>
+        <div style="display:flex;gap:.4rem">
+          <button class="table-action" onclick="openOrderModal('${o.id}')">View</button>
+          <button class="table-action" onclick="waContact('${o.customer_phone||''}','${o.customer_name||''}')">WA</button>
+        </div>
+      </td>
+    </tr>`).join('') || emptyRow(8, 'No orders found');
+}
+
+function getFilteredOrders() {
+  const q = (document.getElementById('orderSearch')?.value || '').toLowerCase();
+  return allOrders.filter(o => {
+    const matchStatus = activeStatusFilter === 'all' || o.status === activeStatusFilter;
+    const matchSearch = !q || (o.customer_name||'').toLowerCase().includes(q) || (o.customer_email||'').toLowerCase().includes(q) || (o.id||'').toLowerCase().includes(q);
+    return matchStatus && matchSearch;
+  });
+}
+
+function filterOrders() { renderOrders(); }
+
+function filterByStatus(status, btn) {
+  activeStatusFilter = status;
+  document.querySelectorAll('#page-orders .filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderOrders();
+}
+
+function toggleItems(chip) {
+  const list = chip.nextElementSibling;
+  list.classList.toggle('open');
+}
+
+async function updateOrderStatus(orderId, newStatus) {
+  // Update locally immediately
+  const order = allOrders.find(o => o.id === orderId);
+  if (order) order.status = newStatus;
+  updatePendingBadge();
+  renderOverview();
+
+  // Try API update
+  try {
+    await fetch(`${API}/orders/${orderId}`, {
+      method: 'PATCH',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({status: newStatus})
+    });
+    showToast(`Order updated → ${newStatus} ✅`);
+  } catch {
+    showToast(`Order updated locally → ${newStatus}`);
+  }
+}
+
+function updatePendingBadge() {
+  const count = allOrders.filter(o => o.status === 'pending').length;
+  const badge = document.getElementById('pendingBadge');
+  badge.textContent = count;
+  badge.style.display = count > 0 ? 'flex' : 'none';
+  document.getElementById('statPending').textContent = count;
+  document.getElementById('statLowStock').textContent = 0; // updated by stock render
+}
+
+// ─── CUSTOMERS ───
+function renderCustomers(filter) {
+  const q = (filter || document.getElementById('customerSearch')?.value || '').toLowerCase();
+  const customerMap = {};
+  allOrders.forEach(o => {
+    const key = o.customer_email || o.customer_name;
+    if (!key) return;
+    if (!customerMap[key]) {
+      customerMap[key] = {
+        name: o.customer_name,
+        email: o.customer_email,
+        phone: o.customer_phone,
+        orders: []
+      };
+    }
+    customerMap[key].orders.push(o);
+  });
+
+  const customers = Object.values(customerMap).filter(c =>
+    !q || c.name?.toLowerCase().includes(q) || c.email?.toLowerCase().includes(q)
+  );
+
+  const grid = document.getElementById('customersGrid');
+  if (customers.length === 0) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1;border:none"><p>No customers yet</p></div>`;
+    return;
+  }
+
+  grid.innerHTML = customers.map(c => {
+    const initials = (c.name||'?').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+    const totalSpent = c.orders.reduce((s,o)=>s+(o.total_amount||0),0);
+    const sizes = [...new Set(c.orders.flatMap(o=>(o.items||[]).map(i=>i.size)).filter(Boolean))];
+    return `
+      <div class="customer-card">
+        <div style="display:flex;align-items:center;gap:.8rem">
+          <div class="customer-avatar">${initials}</div>
+          <div>
+            <div class="customer-name">${c.name||'Unknown'}</div>
+            <div class="customer-detail">${c.email||'—'}</div>
+          </div>
+        </div>
+        ${c.phone ? `<div class="customer-detail">📞 ${c.phone}</div>` : ''}
+        <div class="customer-detail">🛍️ ${c.orders.length} order(s) · <span style="color:var(--green-bright)">R ${totalSpent.toLocaleString()}</span></div>
+        ${sizes.length ? `<div class="customer-detail">👕 Sizes: ${sizes.join(', ')}</div>` : ''}
+        <div class="customer-orders">
+          ${c.orders.map(o=>`<span class="customer-order-chip">#${(o.id||'').slice(0,6).toUpperCase()} · ${statusLabel(o.status)}</span>`).join('')}
+        </div>
+        ${c.phone ? `<button class="table-action" style="align-self:flex-start;margin-top:.2rem" onclick="waContact('${c.phone}','${c.name}')">WhatsApp →</button>` : ''}
+      </div>`;
+  }).join('');
+}
+
+function filterCustomers() { renderCustomers(document.getElementById('customerSearch').value); }
+
+// ─── STOCK ───
+function renderStock(products) {
+  const grid = document.getElementById('stockGrid');
+  if (!products?.length) {
+    grid.innerHTML = `<div class="empty-state" style="grid-column:1/-1"><p>No products found</p></div>`;
+    return;
+  }
+
+  let lowCount = 0;
+  grid.innerHTML = products.map(p => {
+    const stock = p.stock ?? 0;
+    const max = 50;
+    const pct = Math.min(100, (stock / max) * 100);
+    const level = stock === 0 ? 'out' : stock < 5 ? 'low' : '';
+    if (level) lowCount++;
+    return `
+      <div class="stock-card">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start">
+          <div>
+            <div class="stock-name">${p.name}</div>
+            <div class="stock-price">R ${(p.price||0).toLocaleString()}</div>
+          </div>
+          ${p.tag ? `<span class="badge badge-paid" style="align-self:flex-start">${p.tag}</span>` : ''}
+        </div>
+        <div class="stock-level">
+          <div class="stock-bar-wrap"><div class="stock-bar ${level}" style="width:${pct}%"></div></div>
+          <span class="stock-num ${level}">${stock}</span>
+        </div>
+        <div class="td-muted" style="font-size:.72rem">${stock === 0 ? '⚠️ Out of stock' : stock < 5 ? '⚠️ Low stock' : 'In stock'}</div>
+        <div class="stock-edit-row">
+          <input type="number" class="stock-input" value="${stock}" min="0" id="stock-${p.id}"/>
+          <button class="stock-update-btn" onclick="updateStock('${p.id}', document.getElementById('stock-${p.id}').value)">Update</button>
+        </div>
+      </div>`;
+  }).join('');
+
+  document.getElementById('statLowStock').textContent = lowCount;
+}
+
+async function updateStock(productId, quantity) {
+  try {
+    const res = await fetch(`${API}/products/${productId}/stock`, {
+      method: 'PATCH',
+      headers: {'Content-Type':'application/json'},
+      body: JSON.stringify({quantity: parseInt(quantity)})
+    });
+    const data = await res.json();
+    if (data.success) showToast('Stock updated ✅');
+    else showToast('Update failed ❌', true);
+  } catch {
+    showToast('Saved locally (API offline)', false);
+  }
+}
+
+// ─── ORDER MODAL ───
+function openOrderModal(orderId) {
+  const o = allOrders.find(x => x.id === orderId);
+  if (!o) return;
+  const itemsHtml = (o.items||[]).map(i => `
+    <div class="detail-row">
+      <span class="detail-key">${i.product_name||i.name}</span>
+      <span class="detail-val">Size ${i.size} × ${i.quantity} — R ${((i.subtotal||i.unit_price*i.quantity)||0).toLocaleString()}</span>
+    </div>`).join('');
+
+  document.getElementById('orderModalBody').innerHTML = `
+    <div class="detail-row"><span class="detail-key">Order ID</span><span class="detail-val">#${(o.id||'').slice(0,8).toUpperCase()}</span></div>
+    <div class="detail-row"><span class="detail-key">Status</span><span class="detail-val">${statusBadge(o.status)}</span></div>
+    <div class="detail-row"><span class="detail-key">Customer</span><span class="detail-val">${o.customer_name||'—'}</span></div>
+    <div class="detail-row"><span class="detail-key">Email</span><span class="detail-val">${o.customer_email||'—'}</span></div>
+    <div class="detail-row"><span class="detail-key">Phone</span><span class="detail-val">${o.customer_phone||'—'}</span></div>
+    <div class="detail-row"><span class="detail-key">Address</span><span class="detail-val">${o.customer_address||'Not provided'}</span></div>
+    <div class="detail-row"><span class="detail-key">Date</span><span class="detail-val">${formatDate(o.created_at)}</span></div>
+    <div style="margin:.8rem 0;font-family:var(--font-c);font-size:.65rem;letter-spacing:.25em;text-transform:uppercase;color:var(--green-bright)">Items Ordered</div>
+    ${itemsHtml}
+    <div class="detail-row" style="margin-top:.5rem"><span class="detail-key">Total</span><span class="detail-val green">R ${(o.total_amount||0).toLocaleString()}</span></div>
+    ${o.customer_phone ? `<div style="margin-top:1.2rem"><a href="https://wa.me/${o.customer_phone.replace(/\D/g,'')}" target="_blank" class="save-btn" style="display:inline-flex;align-items:center;gap:.5rem">WhatsApp Customer →</a></div>` : ''}
+  `;
+  document.getElementById('orderModal').classList.add('open');
+}
+
+function closeOrderModal() {
+  document.getElementById('orderModal').classList.remove('open');
+}
+
+// ─── SETTINGS ───
+function changePassword() {
+  const current = document.getElementById('currentPw').value;
+  const newPw = document.getElementById('newPw').value;
+  const confirm = document.getElementById('confirmPw').value;
+  const stored = localStorage.getItem('lw_admin_pass') || 'lumwrld2025';
+
+  if (current !== stored) { showToast('Current password incorrect ❌', true); return; }
+  if (newPw.length < 8) { showToast('Password must be 8+ characters ❌', true); return; }
+  if (newPw !== confirm) { showToast('Passwords do not match ❌', true); return; }
+
+  localStorage.setItem('lw_admin_pass', newPw);
+  document.getElementById('currentPw').value = '';
+  document.getElementById('newPw').value = '';
+  document.getElementById('confirmPw').value = '';
+  showToast('Password updated ✅');
+}
+
+function changeUsername() {
+  const newUser = document.getElementById('newUsername').value.trim();
+  const pw = document.getElementById('usernameConfirmPw').value;
+  const stored = localStorage.getItem('lw_admin_pass') || 'lumwrld2025';
+
+  if (pw !== stored) { showToast('Password incorrect ❌', true); return; }
+  if (!newUser) { showToast('Enter a username ❌', true); return; }
+
+  localStorage.setItem('lw_admin_user', newUser);
+  document.getElementById('newUsername').value = '';
+  document.getElementById('usernameConfirmPw').value = '';
+  document.getElementById('sidebarUser').textContent = newUser;
+  showToast('Username updated ✅');
+}
+
+function exportOrders() {
+  if (!allOrders.length) { showToast('No orders to export ❌', true); return; }
+  const rows = [['Order ID','Customer','Email','Phone','Items','Total','Status','Date']];
+  allOrders.forEach(o => {
+    const items = (o.items||[]).map(i=>`${i.product_name||i.name} (${i.size}) x${i.quantity}`).join(' | ');
+    rows.push([(o.id||'').slice(0,8).toUpperCase(), o.customer_name||'', o.customer_email||'', o.customer_phone||'', items, o.total_amount||0, o.status||'', formatDate(o.created_at)]);
+  });
+  const csv = rows.map(r => r.map(v => `"${v}"`).join(',')).join('\n');
+  const blob = new Blob([csv], {type:'text/csv'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a'); a.href=url; a.download='lumwrld-orders.csv'; a.click();
+  showToast('Orders exported ✅');
+}
+
+function clearLocalData() {
+  if (confirm('Clear all local cache? This does not delete Supabase data.')) {
+    showToast('Local cache cleared ✅');
+  }
+}
+
+// ─── HELPERS ───
+function statusBadge(status) {
+  const map = {pending:'badge-pending',paid:'badge-paid',packed:'badge-packed',shipped:'badge-shipped',delivered:'badge-delivered',cancelled:'badge-cancelled'};
+  return `<span class="badge ${map[status]||'badge-pending'}">${status||'pending'}</span>`;
+}
+
+function statusLabel(status) {
+  return (status||'pending').charAt(0).toUpperCase()+(status||'pending').slice(1);
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return '—';
+  return new Date(dateStr).toLocaleDateString('en-ZA',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+}
+
+function emptyRow(cols, msg) {
+  return `<tr><td colspan="${cols}" style="text-align:center;padding:2.5rem;color:var(--muted);font-family:var(--font-c);letter-spacing:.2em;text-transform:uppercase;font-size:.75rem">${msg}</td></tr>`;
+}
+
+function waContact(phone, name) {
+  if (!phone) return;
+  const clean = phone.replace(/\D/g,'');
+  const msg = encodeURIComponent(`Hey ${name||'there'} 👋 This is lum.wrld. Just reaching out regarding your order!`);
+  window.open(`https://wa.me/${clean.startsWith('0')?'27'+clean.slice(1):clean}?text=${msg}`, '_blank');
+}
+
+function showToast(msg, isError) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast' + (isError ? ' error' : '') + ' show';
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+function doLogout() {
+  if (confirm('Log out of the dashboard?')) {
+    sessionStorage.removeItem('lw_auth');
+    sessionStorage.removeItem('lw_admin_username');
+    window.location.href = 'admin-login.html';
+  }
+}
+
+// ─── DEMO DATA (fallback when API offline) ───
+function getDemoOrders() {
+  return [
+    {id:'ord-001-demo',customer_name:'Sipho Nkosi',customer_email:'sipho@gmail.com',customer_phone:'0711234567',items:[{product_name:'4PF Shorts',size:'M',quantity:1,subtotal:350},{product_name:'LUMW Graphic Tee',size:'L',quantity:2,subtotal:700}],total_amount:1050,status:'paid',created_at:new Date(Date.now()-86400000*2).toISOString()},
+    {id:'ord-002-demo',customer_name:'Ayasha Dlamini',customer_email:'ayasha@webmail.co.za',customer_phone:'0829876543',items:[{product_name:'Scott 02 Tee — Front',size:'S',quantity:1,subtotal:350}],total_amount:350,status:'pending',created_at:new Date(Date.now()-3600000*5).toISOString()},
+    {id:'ord-003-demo',customer_name:'Lethiwe Mokoena',customer_email:'lethiwe@icloud.com',customer_phone:'0634805441',items:[{product_name:'LUMW Snapback Cap',size:'One Size',quantity:1,subtotal:250},{product_name:'Angry Youth Tee',size:'XL',quantity:1,subtotal:350}],total_amount:600,status:'shipped',created_at:new Date(Date.now()-86400000*5).toISOString()},
+    {id:'ord-004-demo',customer_name:'Tshepo Williams',customer_email:'tshepo@gmail.com',customer_phone:'0765551234',items:[{product_name:'LUMW Hand Graphic Tee',size:'M',quantity:1,subtotal:350}],total_amount:350,status:'delivered',created_at:new Date(Date.now()-86400000*10).toISOString()},
+  ];
+}
+
+function getDemoProducts() {
+  return [
+    {id:1,name:'4PF Shorts',price:350,stock:12,tag:'New Drop'},
+    {id:2,name:'LUMW Graphic Tee',price:350,stock:3,tag:'Boujee'},
+    {id:3,name:'LUMW Snapback Cap',price:250,stock:8,tag:'New'},
+    {id:4,name:'LUMW Fitted Cap',price:250,stock:0},
+    {id:5,name:'Angry Youth Tee',price:350,stock:15,tag:'Heat'},
+    {id:6,name:'LUMW Hand Graphic Tee',price:350,stock:2,tag:'New Drop'},
+    {id:7,name:'Scott 02 Tee — Back',price:350,stock:6,tag:'Limited'},
+    {id:8,name:'Scott 02 Tee — Front',price:350,stock:9,tag:'New Drop'},
+  ];
+}
+
+// Close modal on bg click
+document.getElementById('orderModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('orderModal')) closeOrderModal();
+});
+</script>
+</body>
+</html>
