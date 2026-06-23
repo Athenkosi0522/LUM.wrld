@@ -952,8 +952,23 @@ tr:hover td{background:rgba(76,206,76,.02)}
 
 <script>
 // ─── AUTH GUARD ───
-if (sessionStorage.getItem('lw_auth') !== 'true') {
+const adminToken = sessionStorage.getItem('lw_admin_token');
+if (!adminToken) {
   window.location.href = 'admin-login.html';
+} else {
+  fetch('/api/auth/admin-verify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token: adminToken })
+  }).then(r => r.json()).then(data => {
+    if (!data.success) {
+      sessionStorage.clear();
+      window.location.href = 'admin-login.html';
+    }
+  }).catch(() => {
+    sessionStorage.clear();
+    window.location.href = 'admin-login.html';
+  });
 }
 
 // ─── STATE ───
@@ -989,7 +1004,7 @@ async function apiFetch(url, options = {}) {
 }
 
 // ─── INIT ───
-document.getElementById('sidebarUser').textContent = sessionStorage.getItem('lw_admin_username') || 'owner';
+document.getElementById('sidebarUser').textContent = sessionStorage.getItem('lw_admin_username') || 'Admin';
 // Pre-fill admin key input
 document.addEventListener('DOMContentLoaded', () => {
   const keyInput = document.getElementById('adminApiKey');
@@ -1451,36 +1466,68 @@ function closeOrderModal() {
 }
 
 // ─── SETTINGS ───
-function changePassword() {
+async function changePassword() {
   const current = document.getElementById('currentPw').value;
   const newPw = document.getElementById('newPw').value;
   const confirm = document.getElementById('confirmPw').value;
-  const stored = localStorage.getItem('lw_admin_pass') || 'lumwrld2025';
 
-  if (current !== stored) { showToast('Current password incorrect ❌', true); return; }
+  if (!current) { showToast('Enter your current password ❌', true); return; }
   if (newPw.length < 8) { showToast('Password must be 8+ characters ❌', true); return; }
   if (newPw !== confirm) { showToast('Passwords do not match ❌', true); return; }
 
-  localStorage.setItem('lw_admin_pass', newPw);
-  document.getElementById('currentPw').value = '';
-  document.getElementById('newPw').value = '';
-  document.getElementById('confirmPw').value = '';
-  showToast('Password updated ✅');
+  try {
+    const res = await fetch('/api/auth/admin-change-password', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        token: sessionStorage.getItem('lw_admin_token'),
+        currentPassword: current,
+        newPassword: newPw
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById('currentPw').value = '';
+      document.getElementById('newPw').value = '';
+      document.getElementById('confirmPw').value = '';
+      showToast('Password updated ✅ — re-login on next session');
+    } else {
+      showToast(data.error || 'Failed to update password ❌', true);
+    }
+  } catch {
+    showToast('Server error — try again ❌', true);
+  }
 }
-
-function changeUsername() {
+async function changeUsername() {
   const newUser = document.getElementById('newUsername').value.trim();
   const pw = document.getElementById('usernameConfirmPw').value;
-  const stored = localStorage.getItem('lw_admin_pass') || 'lumwrld2025';
 
-  if (pw !== stored) { showToast('Password incorrect ❌', true); return; }
   if (!newUser) { showToast('Enter a username ❌', true); return; }
+  if (!pw) { showToast('Enter your password to confirm ❌', true); return; }
 
-  localStorage.setItem('lw_admin_user', newUser);
-  document.getElementById('newUsername').value = '';
-  document.getElementById('usernameConfirmPw').value = '';
-  document.getElementById('sidebarUser').textContent = newUser;
-  showToast('Username updated ✅');
+  try {
+    const res = await fetch('/api/auth/admin-change-username', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        token: sessionStorage.getItem('lw_admin_token'),
+        newUsername: newUser,
+        password: pw
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      sessionStorage.setItem('lw_admin_username', newUser);
+      document.getElementById('newUsername').value = '';
+      document.getElementById('usernameConfirmPw').value = '';
+      document.getElementById('sidebarUser').textContent = newUser;
+      showToast('Username updated ✅');
+    } else {
+      showToast(data.error || 'Failed to update username ❌', true);
+    }
+  } catch {
+    showToast('Server error — try again ❌', true);
+  }
 }
 
 function exportOrdersExcel() {
@@ -1657,7 +1704,14 @@ function statusLabel(status) {
 
 function formatDate(dateStr) {
   if (!dateStr) return '—';
-  return new Date(dateStr).toLocaleDateString('en-ZA',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  return new Date(dateStr).toLocaleString('en-ZA', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    timeZone: 'Africa/Johannesburg'
+  });
 }
 
 function emptyRow(cols, msg) {
@@ -1678,10 +1732,17 @@ function showToast(msg, isError) {
   setTimeout(() => t.classList.remove('show'), 3000);
 }
 
-function doLogout() {
+async function doLogout() {
   if (confirm('Log out of the dashboard?')) {
-    sessionStorage.removeItem('lw_auth');
-    sessionStorage.removeItem('lw_admin_username');
+    const token = sessionStorage.getItem('lw_admin_token');
+    try {
+      await fetch('/api/auth/admin-logout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token })
+      });
+    } catch {}
+    sessionStorage.clear();
     window.location.href = 'admin-login.html';
   }
 }

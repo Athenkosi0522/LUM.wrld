@@ -162,18 +162,11 @@ body::before{
 </div>
 
 <script>
-// Default credentials — change in dashboard settings
-const DEFAULT_USER = 'owner';
-const DEFAULT_PASS = 'lumwrld2025';
+// ─── NO CREDENTIALS IN FRONTEND ───
+// All auth is handled server-side via /api/auth/admin-login
+// Nothing sensitive lives in this file
 
-function getCredentials() {
-  return {
-    username: localStorage.getItem('lw_admin_user') || DEFAULT_USER,
-    password: localStorage.getItem('lw_admin_pass') || DEFAULT_PASS
-  };
-}
-
-function doLogin() {
+async function doLogin() {
   const username = document.getElementById('username').value.trim();
   const password = document.getElementById('password').value;
   const btn = document.getElementById('loginBtn');
@@ -189,11 +182,19 @@ function doLogin() {
   btn.textContent = 'Signing in...';
   err.classList.remove('show');
 
-  setTimeout(() => {
-    const creds = getCredentials();
-    if (username === creds.username && password === creds.password) {
-      sessionStorage.setItem('lw_auth', 'true');
-      sessionStorage.setItem('lw_admin_username', username);
+  try {
+    const res = await fetch('/api/auth/admin-login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password })
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      // Store token only — never the password
+      sessionStorage.setItem('lw_admin_token', data.token);
+      sessionStorage.setItem('lw_admin_username', data.username);
       window.location.href = 'admin-dashboard.html';
     } else {
       err.textContent = 'Incorrect username or password.';
@@ -202,7 +203,12 @@ function doLogin() {
       btn.textContent = 'Login →';
       document.getElementById('password').value = '';
     }
-  }, 800);
+  } catch {
+    err.textContent = 'Server error — please try again.';
+    err.classList.add('show');
+    btn.classList.remove('loading');
+    btn.textContent = 'Login →';
+  }
 }
 
 function togglePw() {
@@ -228,17 +234,28 @@ function closeForgot() {
 
 function sendReset() {
   closeForgot();
-  alert('If that email is registered, a reset link has been sent. Contact lumw.store@gmail.com if you need immediate help.');
 }
 
-// Enter key support
+// ─── ENTER KEY SUPPORT ───
 document.addEventListener('keydown', e => {
   if (e.key === 'Enter') doLogin();
 });
 
-// Already logged in? redirect
-if (sessionStorage.getItem('lw_auth') === 'true') {
-  window.location.href = 'admin-dashboard.html';
+// ─── ALREADY LOGGED IN? VERIFY WITH SERVER ───
+// Never trust sessionStorage alone — always confirm with backend
+const existingToken = sessionStorage.getItem('lw_admin_token');
+if (existingToken) {
+  fetch('/api/auth/admin-verify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ token: existingToken })
+  })
+  .then(r => r.json())
+  .then(data => {
+    if (data.success) window.location.href = 'admin-dashboard.html';
+    else sessionStorage.clear();
+  })
+  .catch(() => sessionStorage.clear());
 }
 </script>
 </body>

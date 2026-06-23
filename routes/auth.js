@@ -233,4 +233,133 @@ router.get('/me', async (req, res) => {
   }
 });
 
+// ─── ADMIN AUTH ───────────────────────────────────────
+
+// POST /api/auth/admin-login
+router.post('/admin-login', async (req, res) => {
+  const { username, password } = req.body;
+
+  const validUser = process.env.ADMIN_USERNAME;
+  const validPass = process.env.ADMIN_PASSWORD;
+
+  if (!validUser || !validPass) {
+    return res.status(500).json({ success: false, error: 'Admin credentials not configured' });
+  }
+
+  if (!username || !password) {
+    return res.status(400).json({ success: false, error: 'Missing credentials' });
+  }
+
+  // Always wait 800ms — prevents timing attacks
+  await new Promise(r => setTimeout(r, 800));
+
+  const userMatch = crypto.timingSafeEqual(
+    Buffer.from(username.padEnd(64)),
+    Buffer.from(validUser.padEnd(64))
+  );
+  const passMatch = crypto.timingSafeEqual(
+    Buffer.from(password.padEnd(64)),
+    Buffer.from(validPass.padEnd(64))
+  );
+
+  if (!userMatch || !passMatch) {
+    console.warn(`⚠️  Failed admin login attempt — IP: ${req.ip}`);
+    return res.status(401).json({ success: false, error: 'Invalid credentials' });
+  }
+
+  // Generate session token
+  const token = crypto.randomBytes(32).toString('hex');
+  req.app.locals.adminSessions = req.app.locals.adminSessions || new Set();
+  req.app.locals.adminSessions.add(token);
+
+  console.log(`✅ Admin login successful — IP: ${req.ip}`);
+  res.json({ success: true, token, username });
+});
+
+// POST /api/auth/admin-verify
+router.post('/admin-verify', (req, res) => {
+  const { token } = req.body;
+  const sessions = req.app.locals.adminSessions || new Set();
+  if (!token || !sessions.has(token)) {
+    return res.status(401).json({ success: false });
+  }
+  res.json({ success: true });
+});
+
+// POST /api/auth/admin-logout
+router.post('/admin-logout', (req, res) => {
+  const { token } = req.body;
+  const sessions = req.app.locals.adminSessions || new Set();
+  sessions.delete(token);
+  console.log(`👋 Admin logged out — IP: ${req.ip}`);
+  res.json({ success: true });
+});
+
+// POST /api/auth/admin-change-password
+router.post('/admin-change-password', async (req, res) => {
+  const { token, currentPassword, newPassword } = req.body;
+
+  // Verify session first
+  const sessions = req.app.locals.adminSessions || new Set();
+  if (!token || !sessions.has(token)) {
+    return res.status(401).json({ success: false, error: 'Unauthorized' });
+  }
+
+  if (!currentPassword || !newPassword) {
+    return res.status(400).json({ success: false, error: 'Missing fields' });
+  }
+
+  if (newPassword.length < 8) {
+    return res.status(400).json({ success: false, error: 'Password must be 8+ characters' });
+  }
+
+  const validPass = process.env.ADMIN_PASSWORD;
+  await new Promise(r => setTimeout(r, 400));
+
+  const passMatch = crypto.timingSafeEqual(
+    Buffer.from(currentPassword.padEnd(64)),
+    Buffer.from(validPass.padEnd(64))
+  );
+
+  if (!passMatch) {
+    return res.status(401).json({ success: false, error: 'Current password incorrect' });
+  }
+
+  // Note: In production you'd update this in a database or secrets manager
+  // For now we update the in-memory env (lasts until server restart)
+  process.env.ADMIN_PASSWORD = newPassword;
+  console.log(`🔑 Admin password changed — IP: ${req.ip}`);
+  res.json({ success: true });
+});
+
+// POST /api/auth/admin-change-username
+router.post('/admin-change-username', async (req, res) => {
+  const { token, newUsername, password } = req.body;
+
+  // Verify session first
+  const sessions = req.app.locals.adminSessions || new Set();
+  if (!token || !sessions.has(token)) {
+    return res.status(401).json({ success: false, error: 'Unauthorized' });
+  }
+
+  if (!newUsername || !password) {
+    return res.status(400).json({ success: false, error: 'Missing fields' });
+  }
+
+  const validPass = process.env.ADMIN_PASSWORD;
+  await new Promise(r => setTimeout(r, 400));
+
+  const passMatch = crypto.timingSafeEqual(
+    Buffer.from(password.padEnd(64)),
+    Buffer.from(validPass.padEnd(64))
+  );
+
+  if (!passMatch) {
+    return res.status(401).json({ success: false, error: 'Password incorrect' });
+  }
+
+  process.env.ADMIN_USERNAME = newUsername;
+  console.log(`👤 Admin username changed — IP: ${req.ip}`);
+  res.json({ success: true });
+});
 module.exports = router;

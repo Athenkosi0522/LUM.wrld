@@ -28,7 +28,7 @@ CREATE TABLE IF NOT EXISTS orders (
   items JSONB NOT NULL,
   total_amount NUMERIC(10, 2) NOT NULL,
   status TEXT DEFAULT 'pending' CHECK (status IN ('pending', 'paid', 'shipped', 'delivered', 'cancelled')),
-  payfast_payment_id TEXT,
+  yoco_payment_id TEXT,
   paid_at TIMESTAMPTZ,
   shipped_at TIMESTAMPTZ,
   tracking_number TEXT,

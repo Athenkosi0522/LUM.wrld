@@ -255,33 +255,22 @@ async function proceedToPayment() {
       return;
     }
 
-    // Get PayFast payment data
-    const payRes = await fetch('/api/payments/initiate', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ order_id: orderData.order_id })
-    });
+   // Get Yoco payment data
+const payRes = await fetch('/api/payments/initiate', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({ order_id: orderData.order_id })
+});
 
-    const payData = await payRes.json();
-    if (!payData.success) {
-      showToast('Payment setup failed ❌');
-      return;
-    }
+const payData = await payRes.json();
+if (!payData.success) {
+  showToast('Payment setup failed ❌');
+  return;
+}
 
-    // Build and submit PayFast form
-    closeAuthModal();
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = payData.payfast_url;
-    Object.entries(payData.payment_data).forEach(([key, value]) => {
-      const input = document.createElement('input');
-      input.type = 'hidden';
-      input.name = key;
-      input.value = value;
-      form.appendChild(input);
-    });
-    document.body.appendChild(form);
-    form.submit();
+ // Redirect to Yoco hosted checkout
+closeAuthModal();
+window.location.href = payData.redirect_url;
 
   } catch {
     showToast('Something went wrong — try again ❌');

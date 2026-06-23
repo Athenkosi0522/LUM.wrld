@@ -1,31 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const crypto = require('crypto');
 const supabase = require('../lib/supabase');
 const { sendOrderConfirmation } = require('../lib/email');
 
-const SANDBOX = process.env.PAYFAST_SANDBOX === 'true';
-const PAYFAST_URL = SANDBOX
-  ? 'https://sandbox.payfast.co.za/eng/process'
-  : 'https://www.payfast.co.za/eng/process';
+const YOCO_API_URL = 'https://payments.yoco.com/api/checkouts';
 
-// Build PayFast signature
-function buildSignature(data, passphrase) {
-  let pfOutput = '';
-  for (const key in data) {
-    if (data[key] !== '') {
-      pfOutput += `${key}=${encodeURIComponent(data[key].trim()).replace(/%20/g, '+')}&`;
-    }
-  }
-  if (passphrase) {
-    pfOutput += `passphrase=${encodeURIComponent(passphrase.trim()).replace(/%20/g, '+')}`;
-  } else {
-    pfOutput = pfOutput.slice(0, -1);
-  }
-  return crypto.createHash('md5').update(pfOutput).digest('hex');
-}
-
-// POST /api/payments/initiate — generate PayFast payment data for an order
+// ─── POST /api/payments/initiate ───
+// Called by the frontend after an order is created.
+// Creates a Yoco hosted checkout and returns the redirect URL.
 router.post('/initiate', async (req, res) => {
   try {
     const { order_id } = req.body;
@@ -49,31 +31,47 @@ router.post('/initiate', async (req, res) => {
       return res.status(400).json({ success: false, error: 'Order already processed' });
     }
 
-    const itemSummary = order.items
-      .map(i => `${i.product_name} x${i.quantity}`)
-      .join(', ');
+    // Yoco expects amount in CENTS (integer)
+    const amountInCents = Math.round(order.total_amount * 100);
 
-    const pfData = {
-      merchant_id: process.env.PAYFAST_MERCHANT_ID,
-      merchant_key: process.env.PAYFAST_MERCHANT_KEY,
-      return_url: `${process.env.PAYFAST_RETURN_URL}?order_id=${order.id}`,
-      cancel_url: `${process.env.PAYFAST_CANCEL_URL}?order_id=${order.id}`,
-      notify_url: process.env.PAYFAST_NOTIFY_URL,
-      name_first: order.customer_name.split(' ')[0],
-      name_last: order.customer_name.split(' ').slice(1).join(' ') || '-',
-      email_address: order.customer_email,
-      m_payment_id: order.id,
-      amount: order.total_amount.toFixed(2),
-      item_name: `lum.wrld Order #${order.id.slice(0, 8)}`,
-      item_description: itemSummary.substring(0, 255),
+    const yocoPayload = {
+      amount: amountInCents,
+      currency: 'ZAR',
+      successUrl: `${process.env.APP_URL}?order_id=${order.id}`,
+      cancelUrl: `${process.env.APP_URL}?cancelled=true&order_id=${order.id}`,
+      failureUrl: `${process.env.APP_URL}?failed=true&order_id=${order.id}`,
+      metadata: {
+        orderId: order.id,
+        customerName: order.customer_name,
+        customerEmail: order.customer_email,
+      },
     };
 
-    pfData.signature = buildSignature(pfData, process.env.PAYFAST_PASSPHRASE);
+    const yocoRes = await fetch(YOCO_API_URL, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${process.env.YOCO_SECRET_KEY}`,
+      },
+      body: JSON.stringify(yocoPayload),
+    });
+
+    const yocoData = await yocoRes.json();
+
+    if (!yocoRes.ok || !yocoData.redirectUrl) {
+      console.error('Yoco checkout error:', yocoData);
+      return res.status(502).json({ success: false, error: 'Failed to create Yoco checkout' });
+    }
+
+    // Save the Yoco checkout ID on the order so we can verify it on the webhook
+    await supabase
+      .from('orders')
+      .update({ yoco_checkout_id: yocoData.id })
+      .eq('id', order.id);
 
     res.json({
       success: true,
-      payfast_url: PAYFAST_URL,
-      payment_data: pfData
+      redirect_url: yocoData.redirectUrl,
     });
   } catch (err) {
     console.error('POST /payments/initiate error:', err.message);
@@ -81,86 +79,119 @@ router.post('/initiate', async (req, res) => {
   }
 });
 
-// POST /api/payments/notify — PayFast ITN (Instant Transaction Notification)
-// PayFast calls this server-to-server when a payment is completed
-router.post('/notify', express.urlencoded({ extended: false }), async (req, res) => {
+// ─── POST /api/payments/notify ───
+// Yoco calls this webhook server-to-server when a payment event occurs.
+// Set this URL in your Yoco dashboard under Developers → Webhooks.
+// Expected value: https://yourdomain.com/api/payments/notify
+router.post('/notify', express.raw({ type: 'application/json' }), async (req, res) => {
   try {
-    const pfData = req.body;
+    // ─── SIGNATURE VERIFICATION ───
+    const signature = req.headers['webhook-signature'];
+    const webhookSecret = process.env.YOCO_WEBHOOK_SECRET;
 
-    // Step 1: Verify signature
-    const receivedSig = pfData.signature;
-    const dataToVerify = { ...pfData };
-    delete dataToVerify.signature;
-    const expectedSig = buildSignature(dataToVerify, process.env.PAYFAST_PASSPHRASE);
-
-    if (receivedSig !== expectedSig) {
-      console.error('PayFast ITN: Invalid signature');
-      return res.status(400).send('Invalid signature');
+    if (!webhookSecret) {
+      console.error('❌ YOCO_WEBHOOK_SECRET not set in .env');
+      return res.status(500).json({ error: 'Webhook secret not configured' });
     }
 
-    // Step 2: Verify payment status
-    const paymentStatus = pfData.payment_status;
-    const orderId = pfData.m_payment_id;
-
-    if (!orderId) {
-      return res.status(400).send('Missing order ID');
+    if (!signature) {
+      console.warn('⚠️  Yoco webhook received with no signature — rejected');
+      return res.status(401).json({ error: 'Missing signature' });
     }
 
-    // Step 3: Fetch order
-    const { data: order, error } = await supabase
-      .from('orders')
-      .select('*')
-      .eq('id', orderId)
-      .single();
+    const crypto = require('crypto');
+    const expectedSig = crypto
+      .createHmac('sha256', webhookSecret)
+      .update(req.body)
+      .digest('hex');
+
+    let sigValid = false;
+    try {
+      const sigBuf = Buffer.from(signature);
+      const expBuf = Buffer.from(expectedSig);
+      sigValid = sigBuf.length === expBuf.length &&
+        crypto.timingSafeEqual(sigBuf, expBuf);
+    } catch {
+      sigValid = false;
+    }
+
+    if (!sigValid) {
+      console.warn('⚠️  Yoco webhook signature mismatch — rejected');
+      return res.status(401).json({ error: 'Invalid signature' });
+    }
+
+    // Parse raw body into event object
+    const event = JSON.parse(req.body.toString());
+
+    // Only handle successful payment events
+    if (event.type !== 'payment.succeeded') {
+      return res.status(200).json({ received: true });
+    }
+
+    const checkoutId = event.payload?.metadata?.checkoutId || event.payload?.checkoutId;
+    const orderId    = event.payload?.metadata?.orderId;
+
+    if (!orderId && !checkoutId) {
+      console.error('Yoco webhook: no orderId or checkoutId in payload');
+      return res.status(400).json({ error: 'Missing order reference' });
+    }
+
+    // Find the order — prefer orderId from metadata, fall back to yoco_checkout_id column
+    let query = supabase.from('orders').select('*');
+    if (orderId) {
+      query = query.eq('id', orderId);
+    } else {
+      query = query.eq('yoco_checkout_id', checkoutId);
+    }
+    const { data: order, error } = await query.single();
 
     if (error || !order) {
-      console.error('PayFast ITN: Order not found', orderId);
-      return res.status(404).send('Order not found');
+      console.error('Yoco webhook: order not found', { orderId, checkoutId });
+      return res.status(404).json({ error: 'Order not found' });
     }
 
-    // Step 4: Verify amount matches
-    const paidAmount = parseFloat(pfData.amount_gross);
-    if (Math.abs(paidAmount - order.total_amount) > 0.01) {
-      console.error('PayFast ITN: Amount mismatch', paidAmount, order.total_amount);
-      return res.status(400).send('Amount mismatch');
+    // Idempotency — ignore if already paid
+    if (order.status === 'paid') {
+      return res.status(200).json({ received: true });
     }
 
-    // Step 5: Update order status
-    if (paymentStatus === 'COMPLETE') {
-      const { error: updateError } = await supabase
-        .from('orders')
-        .update({
-          status: 'paid',
-          payfast_payment_id: pfData.pf_payment_id,
-          paid_at: new Date().toISOString()
-        })
-        .eq('id', orderId);
+    // Verify the amount paid matches what we expect (in cents)
+    const paidAmountCents = event.payload?.amount;
+    const expectedCents   = Math.round(order.total_amount * 100);
 
-      if (updateError) throw updateError;
-
-      // Step 6: Deduct stock for each item
-      for (const item of order.items) {
-        await supabase.rpc('decrement_stock', {
-          p_product_id: item.product_id,
-          p_quantity: item.quantity
-        });
-      }
-
-      // Step 7: Send confirmation email
-      await sendOrderConfirmation(order);
-
-      console.log(`✅ Order ${orderId} paid — R${order.total_amount}`);
-    } else if (paymentStatus === 'CANCELLED') {
-      await supabase
-        .from('orders')
-        .update({ status: 'cancelled' })
-        .eq('id', orderId);
+    if (paidAmountCents !== undefined && Math.abs(paidAmountCents - expectedCents) > 1) {
+      console.error('Yoco webhook: amount mismatch', { paidAmountCents, expectedCents });
+      return res.status(400).json({ error: 'Amount mismatch' });
     }
 
-    res.status(200).send('OK');
+    // Mark the order as paid
+    const { error: updateError } = await supabase
+      .from('orders')
+      .update({
+        status: 'paid',
+        yoco_payment_id: event.payload?.id || null,
+        paid_at: new Date().toISOString(),
+      })
+      .eq('id', order.id);
+
+    if (updateError) throw updateError;
+
+    // Deduct stock for each ordered item
+    for (const item of order.items) {
+      await supabase.rpc('decrement_stock', {
+        p_product_id: item.product_id,
+        p_quantity: item.quantity,
+      });
+    }
+
+    // Send order confirmation email to customer
+    await sendOrderConfirmation(order);
+
+    console.log(`✅ Yoco payment confirmed — Order ${order.id} · R${order.total_amount}`);
+    res.status(200).json({ received: true });
   } catch (err) {
     console.error('POST /payments/notify error:', err.message);
-    res.status(500).send('Server error');
+    res.status(500).json({ error: 'Server error' });
   }
 });
 
